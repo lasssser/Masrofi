@@ -8,6 +8,7 @@ import {
   RefreshControl,
   StatusBar,
   TextInput,
+  Keyboard,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';

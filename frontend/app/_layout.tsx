@@ -131,6 +131,17 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
+          name="income/add" 
+          options={{ 
+            presentation: 'modal',
+            headerShown: true,
+            headerStyle: { backgroundColor: COLORS.backgroundLight },
+            headerTintColor: COLORS.text,
+            headerTitle: 'إضافة دخل',
+            headerTitleStyle: { fontFamily: 'Cairo_600SemiBold' },
+          }} 
+        />
+        <Stack.Screen 
           name="debt/add" 
           options={{ 
             presentation: 'modal',

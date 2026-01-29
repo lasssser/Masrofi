@@ -5,19 +5,21 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "bayti-budget",
+    "scheme": "masrofi-wethaq",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.wethaqdigital.masrofi",
       "infoPlist": {
         "NSUserNotificationUsageDescription": "تذكيرك بمواعيد استحقاق الديون"
       }
     },
     "android": {
+      "package": "com.wethaqdigital.masrofi",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#1a1a2e"
+        "backgroundColor": "#0F172A"
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
@@ -39,7 +41,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#1a1a2e"
+          "backgroundColor": "#0F172A"
         }
       ],
       [

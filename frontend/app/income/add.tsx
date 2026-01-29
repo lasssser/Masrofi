@@ -270,6 +270,7 @@ export default function AddIncomeScreen() {
             style={styles.saveButton}
           />
         </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

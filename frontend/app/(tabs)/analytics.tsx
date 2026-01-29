@@ -330,6 +330,8 @@ export default function AnalyticsScreen() {
               style={styles.chatMessages}
               contentContainerStyle={styles.chatMessagesContent}
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              onScrollBeginDrag={Keyboard.dismiss}
             >
               {/* Welcome Message */}
               {chatMessages.length === 0 && (

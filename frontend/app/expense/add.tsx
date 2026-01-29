@@ -18,6 +18,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../../constants/theme';
 import { expenseStorage, CATEGORIES, settingsStorage, Settings } from '../../utils/storage';
 import { generateId, formatDate } from '../../utils/helpers';
+import { checkAchievements, streakStorage } from '../../utils/achievements';
+import { checkSpendingAlerts } from '../../utils/alerts';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 

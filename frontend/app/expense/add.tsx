@@ -64,6 +64,14 @@ export default function AddExpenseScreen() {
         date: date.toISOString(),
         notes: notes.trim() || undefined,
       });
+      
+      // Check achievements and alerts after adding expense
+      await Promise.all([
+        streakStorage.update(),
+        checkAchievements(),
+        checkSpendingAlerts(),
+      ]);
+      
       router.back();
     } catch (error) {
       Alert.alert('خطأ', 'فشل حفظ المصروف');

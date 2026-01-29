@@ -1,139 +1,112 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
-import { COLORS, SPACING, FONTS } from '../../constants/theme';
+import { View, StyleSheet, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { COLORS, FONTS } from '../../constants/theme';
 
 export default function TabLayout() {
-  const router = useRouter();
-  
-  // Fixed tab bar height with extra padding for Android navigation bar
-  const tabBarHeight = Platform.OS === 'android' ? 75 : 65;
-  const tabBarPaddingBottom = Platform.OS === 'android' ? 15 : 8;
-
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textMuted,
         tabBarStyle: {
-          backgroundColor: COLORS.backgroundLight,
-          borderTopColor: COLORS.border,
-          borderTopWidth: 1,
-          height: tabBarHeight,
-          paddingBottom: tabBarPaddingBottom,
-          paddingTop: 6,
+          position: 'absolute',
+          backgroundColor: Platform.OS === 'ios' ? 'transparent' : COLORS.backgroundLight,
+          borderTopWidth: 0,
+          elevation: 0,
+          height: Platform.OS === 'android' ? 70 : 85,
+          paddingBottom: Platform.OS === 'android' ? 10 : 25,
+          paddingTop: 10,
         },
+        tabBarBackground: () => (
+          Platform.OS === 'ios' ? (
+            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+          ) : (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: COLORS.backgroundLight }]} />
+          )
+        ),
         tabBarLabelStyle: {
-          fontSize: 9,
+          fontSize: 11,
           fontFamily: FONTS.semiBold,
+          marginTop: 2,
         },
         headerStyle: {
-          backgroundColor: COLORS.backgroundLight,
+          backgroundColor: COLORS.background,
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
         },
         headerTintColor: COLORS.text,
         headerTitleStyle: {
           fontFamily: FONTS.bold,
-          fontSize: 18,
+          fontSize: 20,
         },
-        headerRight: () => (
-          <TouchableOpacity
-            onPress={() => router.push('/settings')}
-            style={styles.settingsButton}
-          >
-            <Ionicons name="settings-outline" size={24} color={COLORS.text} />
-          </TouchableOpacity>
-        ),
+        headerShown: false,
       }}
     >
       <Tabs.Screen
-        name="dashboard"
-        options={{
-          title: 'الرئيسية',
-          headerTitle: 'لوحة التحكم',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={22} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="index"
         options={{
-          title: 'المصروفات',
-          headerTitle: 'المصروفات',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="wallet-outline" size={22} color={color} />
+          title: 'الرئيسية',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIcon : null}>
+              <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
-        name="budget"
+        name="wallet"
         options={{
-          title: 'الميزانية',
-          headerTitle: 'الميزانية',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="calculator-outline" size={22} color={color} />
+          title: 'المحفظة',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIcon : null}>
+              <Ionicons name={focused ? "wallet" : "wallet-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
-        name="savings"
+        name="analytics"
         options={{
-          title: 'الادخار',
-          headerTitle: 'الادخار',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="trending-up-outline" size={22} color={color} />
+          title: 'التحليلات',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIcon : null}>
+              <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
       <Tabs.Screen
-        name="debts"
+        name="more"
         options={{
-          title: 'الديون',
-          headerTitle: 'الديون',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="people-outline" size={22} color={color} />
+          title: 'المزيد',
+          tabBarIcon: ({ color, focused }) => (
+            <View style={focused ? styles.activeIcon : null}>
+              <Ionicons name={focused ? "grid" : "grid-outline"} size={24} color={color} />
+            </View>
           ),
         }}
       />
-      <Tabs.Screen
-        name="shopping"
-        options={{
-          title: 'التسوق',
-          headerTitle: 'التسوق',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="cart-outline" size={22} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="stats"
-        options={{
-          title: 'التقارير',
-          headerTitle: 'التقارير',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="stats-chart-outline" size={22} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="ai-analysis"
-        options={{
-          title: 'الذكاء',
-          headerTitle: 'المستشار الذكي',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="sparkles" size={22} color={color} />
-          ),
-        }}
-      />
+      
+      {/* Hidden screens */}
+      <Tabs.Screen name="budget" options={{ href: null }} />
+      <Tabs.Screen name="savings" options={{ href: null }} />
+      <Tabs.Screen name="debts" options={{ href: null }} />
+      <Tabs.Screen name="shopping" options={{ href: null }} />
+      <Tabs.Screen name="stats" options={{ href: null }} />
+      <Tabs.Screen name="ai-analysis" options={{ href: null }} />
+      <Tabs.Screen name="dashboard" options={{ href: null }} />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
-  settingsButton: {
-    marginRight: SPACING.md,
-    padding: SPACING.xs,
+  activeIcon: {
+    backgroundColor: COLORS.primary + '20',
+    padding: 8,
+    borderRadius: 12,
   },
 });

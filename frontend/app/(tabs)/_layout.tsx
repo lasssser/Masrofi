@@ -45,9 +45,7 @@ export default function TabLayout() {
         options={{
           title: 'الرئيسية',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIcon : null}>
-              <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
-            </View>
+            <Ionicons name={focused ? "home" : "home-outline"} size={26} color={color} />
           ),
         }}
       />
@@ -56,9 +54,7 @@ export default function TabLayout() {
         options={{
           title: 'المحفظة',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIcon : null}>
-              <Ionicons name={focused ? "wallet" : "wallet-outline"} size={24} color={color} />
-            </View>
+            <Ionicons name={focused ? "wallet" : "wallet-outline"} size={26} color={color} />
           ),
         }}
       />
@@ -67,9 +63,7 @@ export default function TabLayout() {
         options={{
           title: 'التحليلات',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIcon : null}>
-              <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={24} color={color} />
-            </View>
+            <Ionicons name={focused ? "stats-chart" : "stats-chart-outline"} size={26} color={color} />
           ),
         }}
       />
@@ -78,9 +72,7 @@ export default function TabLayout() {
         options={{
           title: 'المزيد',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeIcon : null}>
-              <Ionicons name={focused ? "grid" : "grid-outline"} size={24} color={color} />
-            </View>
+            <Ionicons name={focused ? "grid" : "grid-outline"} size={26} color={color} />
           ),
         }}
       />

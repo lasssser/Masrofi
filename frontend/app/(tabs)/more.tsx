@@ -25,6 +25,22 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   {
+    id: 'achievements',
+    title: 'الإنجازات',
+    subtitle: 'اجمع الشارات والنقاط',
+    icon: 'trophy',
+    color: '#F59E0B',
+    route: '/achievements',
+  },
+  {
+    id: 'alerts',
+    title: 'التنبيهات والمقارنة',
+    subtitle: 'تنبيهات الإنفاق والمقارنة الشهرية',
+    icon: 'notifications',
+    color: '#EF4444',
+    route: '/alerts',
+  },
+  {
     id: 'debts',
     title: 'الديون',
     subtitle: 'تتبع ديونك والمستحقات',

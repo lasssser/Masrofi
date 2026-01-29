@@ -13,7 +13,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: COLORS.textMuted,
         tabBarStyle: {
           position: 'absolute',
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : COLORS.backgroundLight,
+          backgroundColor: COLORS.backgroundLight,
           borderTopWidth: 0,
           elevation: 0,
           height: Platform.OS === 'android' ? 70 : 85,
@@ -27,6 +27,9 @@ export default function TabLayout() {
             <View style={[StyleSheet.absoluteFill, { backgroundColor: COLORS.backgroundLight }]} />
           )
         ),
+        sceneContainerStyle: {
+          backgroundColor: COLORS.background,
+        },
         tabBarLabelStyle: {
           fontSize: 11,
           fontFamily: FONTS.semiBold,

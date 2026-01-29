@@ -192,6 +192,7 @@ export default function AddExpenseScreen() {
             style={styles.saveButton}
           />
         </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

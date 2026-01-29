@@ -555,6 +555,19 @@ export default function SettingsScreen() {
             <Ionicons name="cloud-outline" size={24} color={COLORS.primary} />
             <Text style={styles.sectionTitle}>النسخ الاحتياطي</Text>
           </View>
+
+          <TouchableOpacity
+            style={styles.backupButton}
+            onPress={() => router.push('/cloud-sync')}
+          >
+            <View style={styles.backupButtonContent}>
+              <Text style={styles.backupButtonText}>المزامنة السحابية</Text>
+              <Ionicons name="cloud" size={20} color={COLORS.primary} />
+            </View>
+            <Text style={styles.backupButtonDescription}>
+              نسخ احتياطي واستعادة البيانات
+            </Text>
+          </TouchableOpacity>
           
           <TouchableOpacity
             style={styles.backupButton}

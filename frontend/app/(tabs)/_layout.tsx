@@ -113,6 +113,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="ai-analysis"
+        options={{
+          title: 'الذكاء',
+          headerTitle: 'المستشار الذكي',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="sparkles" size={22} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

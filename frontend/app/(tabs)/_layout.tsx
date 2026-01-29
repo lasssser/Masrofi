@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity, View, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 
@@ -17,12 +17,12 @@ export default function TabLayout() {
           backgroundColor: COLORS.backgroundLight,
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 70,
-          paddingBottom: 10,
-          paddingTop: 8,
+          height: 65,
+          paddingBottom: 8,
+          paddingTop: 6,
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 9,
           fontFamily: FONTS.semiBold,
         },
         headerStyle: {
@@ -44,11 +44,21 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: 'الرئيسية',
+          headerTitle: 'لوحة التحكم',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="home-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: 'المصروفات',
-          headerTitle: 'مصروفي',
-          tabBarIcon: ({ color, size }) => (
+          headerTitle: 'المصروفات',
+          tabBarIcon: ({ color }) => (
             <Ionicons name="wallet-outline" size={22} color={color} />
           ),
         }}
@@ -57,8 +67,8 @@ export default function TabLayout() {
         name="budget"
         options={{
           title: 'الميزانية',
-          headerTitle: 'الميزانية الشهرية',
-          tabBarIcon: ({ color, size }) => (
+          headerTitle: 'الميزانية',
+          tabBarIcon: ({ color }) => (
             <Ionicons name="calculator-outline" size={22} color={color} />
           ),
         }}
@@ -67,8 +77,8 @@ export default function TabLayout() {
         name="savings"
         options={{
           title: 'الادخار',
-          headerTitle: 'أهداف الادخار',
-          tabBarIcon: ({ color, size }) => (
+          headerTitle: 'الادخار',
+          tabBarIcon: ({ color }) => (
             <Ionicons name="trending-up-outline" size={22} color={color} />
           ),
         }}
@@ -78,7 +88,7 @@ export default function TabLayout() {
         options={{
           title: 'الديون',
           headerTitle: 'الديون',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons name="people-outline" size={22} color={color} />
           ),
         }}
@@ -87,8 +97,8 @@ export default function TabLayout() {
         name="shopping"
         options={{
           title: 'التسوق',
-          headerTitle: 'قوائم التسوق',
-          tabBarIcon: ({ color, size }) => (
+          headerTitle: 'التسوق',
+          tabBarIcon: ({ color }) => (
             <Ionicons name="cart-outline" size={22} color={color} />
           ),
         }}
@@ -96,9 +106,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="stats"
         options={{
-          title: 'الإحصائيات',
-          headerTitle: 'الإحصائيات والتقارير',
-          tabBarIcon: ({ color, size }) => (
+          title: 'التقارير',
+          headerTitle: 'التقارير',
+          tabBarIcon: ({ color }) => (
             <Ionicons name="stats-chart-outline" size={22} color={color} />
           ),
         }}

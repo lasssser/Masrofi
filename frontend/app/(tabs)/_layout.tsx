@@ -1,12 +1,18 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 
 export default function TabLayout() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  
+  // Calculate tab bar height based on safe area
+  const tabBarHeight = Platform.OS === 'android' ? 65 + insets.bottom : 65;
+  const tabBarPaddingBottom = Platform.OS === 'android' ? 10 + insets.bottom : 8;
 
   return (
     <Tabs
@@ -17,8 +23,8 @@ export default function TabLayout() {
           backgroundColor: COLORS.backgroundLight,
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 65,
-          paddingBottom: 8,
+          height: tabBarHeight,
+          paddingBottom: tabBarPaddingBottom,
           paddingTop: 6,
         },
         tabBarLabelStyle: {

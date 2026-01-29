@@ -2,38 +2,29 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, StyleSheet, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { COLORS, FONTS } from '../../constants/theme';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textMuted,
+        tabBarActiveTintColor: '#6366F1',
+        tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          position: 'absolute',
-          backgroundColor: COLORS.backgroundLight,
-          borderTopWidth: 0,
-          elevation: 0,
-          height: Platform.OS === 'android' ? 70 : 85,
-          paddingBottom: Platform.OS === 'android' ? 10 : 25,
-          paddingTop: 10,
+          backgroundColor: '#1A1A2E',
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(255,255,255,0.1)',
+          height: Platform.OS === 'android' ? 65 : 85,
+          paddingBottom: Platform.OS === 'android' ? 8 : 25,
+          paddingTop: 8,
         },
-        tabBarBackground: () => (
-          Platform.OS === 'ios' ? (
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-          ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: COLORS.backgroundLight }]} />
-          )
-        ),
         sceneContainerStyle: {
           backgroundColor: COLORS.background,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 12,
           fontFamily: FONTS.semiBold,
-          marginTop: 2,
+          marginTop: 4,
         },
         headerStyle: {
           backgroundColor: COLORS.background,

@@ -1,11 +1,12 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { I18nManager, Platform, View, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
-import * as SplashScreen from 'expo-splash-screen';
+import * as ExpoSplashScreen from 'expo-splash-screen';
 import { COLORS } from '../constants/theme';
+import SplashScreen from '../components/SplashScreen';
 
 // Force RTL for Arabic
 if (!I18nManager.isRTL) {
@@ -14,9 +15,10 @@ if (!I18nManager.isRTL) {
 }
 
 // Keep splash screen visible while loading fonts
-SplashScreen.preventAutoHideAsync();
+ExpoSplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [showSplash, setShowSplash] = useState(true);
   const [fontsLoaded] = useFonts({
     Cairo_400Regular,
     Cairo_500Medium,
@@ -26,7 +28,7 @@ export default function RootLayout() {
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      await ExpoSplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
@@ -34,11 +36,25 @@ export default function RootLayout() {
     onLayoutRootView();
   }, [onLayoutRootView]);
 
+  const handleSplashFinish = () => {
+    setShowSplash(false);
+  };
+
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background }}>
         <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
+    );
+  }
+
+  // Show custom splash screen
+  if (showSplash) {
+    return (
+      <SafeAreaProvider>
+        <StatusBar style="light" />
+        <SplashScreen onFinish={handleSplashFinish} />
+      </SafeAreaProvider>
     );
   }
 

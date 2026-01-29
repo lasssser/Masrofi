@@ -498,6 +498,148 @@ export const settingsStorage = {
   },
 };
 
+// Income
+export const incomeStorage = {
+  async getAll(): Promise<Income[]> {
+    return getData<Income[]>(KEYS.INCOME, []);
+  },
+  async getByMonth(month: string): Promise<Income[]> {
+    const incomes = await this.getAll();
+    return incomes.filter(i => i.date.startsWith(month));
+  },
+  async add(income: Income): Promise<void> {
+    const incomes = await this.getAll();
+    incomes.unshift(income);
+    await setData(KEYS.INCOME, incomes);
+  },
+  async update(id: string, updates: Partial<Income>): Promise<void> {
+    const incomes = await this.getAll();
+    const index = incomes.findIndex(i => i.id === id);
+    if (index !== -1) {
+      incomes[index] = { ...incomes[index], ...updates };
+      await setData(KEYS.INCOME, incomes);
+    }
+  },
+  async delete(id: string): Promise<void> {
+    const incomes = await this.getAll();
+    const filtered = incomes.filter(i => i.id !== id);
+    await setData(KEYS.INCOME, filtered);
+  },
+  async getMonthlyTotal(month: string): Promise<number> {
+    const incomes = await this.getByMonth(month);
+    return incomes.reduce((sum, i) => sum + i.amount, 0);
+  },
+};
+
+// Smart Financial Analysis
+export const financialAnalysis = {
+  async getMonthlyForecast(month: string): Promise<{
+    totalIncome: number;
+    expectedExpenses: number;
+    recurringExpenses: number;
+    dueDebts: number;
+    upcomingBills: number;
+    estimatedRemaining: number;
+    lastMonthAverage: number;
+    savingsGoalContributions: number;
+  }> {
+    const currentMonth = month || new Date().toISOString().slice(0, 7);
+    const lastMonth = getLastMonth(currentMonth);
+    
+    // Get total income for current month
+    const totalIncome = await incomeStorage.getMonthlyTotal(currentMonth);
+    
+    // Get recurring expenses
+    const allRecurring = await recurringExpenseStorage.getAll();
+    const activeRecurring = allRecurring.filter(r => r.isActive);
+    const recurringExpenses = activeRecurring.reduce((sum, r) => {
+      if (r.frequency === 'monthly') return sum + r.amount;
+      if (r.frequency === 'weekly') return sum + (r.amount * 4);
+      if (r.frequency === 'daily') return sum + (r.amount * 30);
+      if (r.frequency === 'yearly') return sum + (r.amount / 12);
+      return sum;
+    }, 0);
+    
+    // Get due debts this month
+    const allDebts = await debtStorage.getAll();
+    const dueDebts = allDebts
+      .filter(d => d.status === 'نشط' && d.type === 'علينا' && d.dueDate.startsWith(currentMonth))
+      .reduce((sum, d) => sum + d.totalAmount, 0);
+    
+    // Get upcoming bills
+    const allBills = await billReminderStorage.getAll();
+    const upcomingBills = allBills
+      .filter(b => !b.isPaid && b.dueDate.startsWith(currentMonth))
+      .reduce((sum, b) => sum + b.amount, 0);
+    
+    // Get last month's expenses for estimation
+    const allExpenses = await expenseStorage.getAll();
+    const lastMonthExpenses = allExpenses.filter(e => e.date.startsWith(lastMonth));
+    const lastMonthTotal = lastMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const lastMonthAverage = lastMonthTotal;
+    
+    // Calculate expected expenses based on last month + recurring
+    const expectedExpenses = Math.max(lastMonthAverage, recurringExpenses + dueDebts + upcomingBills);
+    
+    // Get savings goals for monthly contributions (estimate 10% of income)
+    const savingsGoalContributions = totalIncome * 0.1;
+    
+    // Calculate estimated remaining
+    const estimatedRemaining = totalIncome - expectedExpenses - savingsGoalContributions;
+    
+    return {
+      totalIncome,
+      expectedExpenses,
+      recurringExpenses,
+      dueDebts,
+      upcomingBills,
+      estimatedRemaining,
+      lastMonthAverage,
+      savingsGoalContributions,
+    };
+  },
+  
+  async getCategoryAnalysis(month: string): Promise<Array<{
+    category: string;
+    thisMonth: number;
+    lastMonth: number;
+    change: number;
+    changePercent: number;
+  }>> {
+    const currentMonth = month || new Date().toISOString().slice(0, 7);
+    const lastMonth = getLastMonth(currentMonth);
+    
+    const allExpenses = await expenseStorage.getAll();
+    const thisMonthExpenses = allExpenses.filter(e => e.date.startsWith(currentMonth));
+    const lastMonthExpenses = allExpenses.filter(e => e.date.startsWith(lastMonth));
+    
+    return CATEGORIES.map(cat => {
+      const thisMonthTotal = thisMonthExpenses
+        .filter(e => e.category === cat.id)
+        .reduce((sum, e) => sum + e.amount, 0);
+      const lastMonthTotal = lastMonthExpenses
+        .filter(e => e.category === cat.id)
+        .reduce((sum, e) => sum + e.amount, 0);
+      const change = thisMonthTotal - lastMonthTotal;
+      const changePercent = lastMonthTotal > 0 ? (change / lastMonthTotal) * 100 : 0;
+      
+      return {
+        category: cat.id,
+        thisMonth: thisMonthTotal,
+        lastMonth: lastMonthTotal,
+        change,
+        changePercent,
+      };
+    }).filter(c => c.thisMonth > 0 || c.lastMonth > 0);
+  },
+};
+
+function getLastMonth(month: string): string {
+  const [year, monthNum] = month.split('-').map(Number);
+  const date = new Date(year, monthNum - 2, 1);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
 // Backup & Restore
 export const backupStorage = {
   async exportAll(): Promise<string> {

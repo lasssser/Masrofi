@@ -113,6 +113,16 @@ export interface Settings {
   defaultWalletId?: string;
 }
 
+export interface Income {
+  id: string;
+  title: string;
+  amount: number;
+  date: string;
+  isRecurring: boolean;
+  frequency?: 'monthly' | 'weekly' | 'biweekly';
+  notes?: string;
+}
+
 // Categories
 export const CATEGORIES = [
   { id: 'food', label: 'أكل', icon: 'fast-food' },

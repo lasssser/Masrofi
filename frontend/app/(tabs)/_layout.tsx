@@ -3,7 +3,7 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { COLORS, SPACING } from '../../constants/theme';
+import { COLORS, SPACING, FONTS } from '../../constants/theme';
 
 export default function TabLayout() {
   const router = useRouter();
@@ -23,14 +23,14 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontFamily: FONTS.semiBold,
         },
         headerStyle: {
           backgroundColor: COLORS.backgroundLight,
         },
         headerTintColor: COLORS.text,
         headerTitleStyle: {
-          fontWeight: '700',
+          fontFamily: FONTS.bold,
           fontSize: 18,
         },
         headerRight: () => (
@@ -47,7 +47,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'المصروف',
-          headerTitle: 'بيتي بادجِت',
+          headerTitle: 'مصروفي',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet-outline" size={size} color={color} />
           ),

@@ -203,6 +203,18 @@ export default function RootLayout() {
             headerTitleStyle: { fontFamily: 'Cairo_600SemiBold' },
           }} 
         />
+        <Stack.Screen 
+          name="achievements" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
+        <Stack.Screen 
+          name="alerts" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
       </Stack>
     </SafeAreaProvider>
   );

@@ -12,6 +12,7 @@ const KEYS = {
   RECURRING_EXPENSES: 'masrofi_recurring',
   WALLETS: 'masrofi_wallets',
   BILL_REMINDERS: 'masrofi_bill_reminders',
+  INCOME: 'masrofi_income',
 };
 
 // Types

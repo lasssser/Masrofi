@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 
 ROOT_DIR = Path(__file__).parent
@@ -18,6 +19,9 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# LLM API Key
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -35,10 +39,32 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# AI Analysis Models
+class FinancialData(BaseModel):
+    expenses: List[Dict[str, Any]]
+    incomes: List[Dict[str, Any]]
+    debts: List[Dict[str, Any]]
+    budgets: List[Dict[str, Any]]
+    savings_goals: List[Dict[str, Any]]
+    recurring_expenses: List[Dict[str, Any]]
+    currency: str = "TRY"
+
+class AIAnalysisRequest(BaseModel):
+    financial_data: FinancialData
+    analysis_type: str = "full"  # full, spending, savings, forecast, tips
+
+class AIAnalysisResponse(BaseModel):
+    analysis: str
+    insights: List[str]
+    recommendations: List[str]
+    spending_patterns: Optional[Dict[str, Any]] = None
+    forecast: Optional[Dict[str, Any]] = None
+    alerts: Optional[List[str]] = None
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Masrofi API - مصروفي"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):

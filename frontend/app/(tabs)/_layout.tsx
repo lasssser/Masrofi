@@ -88,11 +88,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  activeIcon: {
-    backgroundColor: COLORS.primary + '20',
-    padding: 8,
-    borderRadius: 12,
-  },
-});

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,34 +7,61 @@ import {
   TouchableOpacity,
   RefreshControl,
   Dimensions,
+  StatusBar,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { PieChart, BarChart } from 'react-native-gifted-charts';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../../constants/theme';
-import { expenseStorage, Expense, CATEGORIES, settingsStorage, Settings } from '../../utils/storage';
-import { formatCurrency, formatDate, isToday, isThisMonth, getDaysAgo, getDatesBetween } from '../../utils/helpers';
-import Card from '../../components/Card';
-import EmptyState from '../../components/EmptyState';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS, BADGES } from '../../constants/theme';
+import {
+  expenseStorage,
+  incomeStorage,
+  settingsStorage,
+  Settings,
+  financialAnalysis,
+} from '../../utils/storage';
+import { formatCurrency } from '../../utils/helpers';
 
-const screenWidth = Dimensions.get('window').width;
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - SPACING.md * 3) / 2;
 
-export default function ExpensesScreen() {
+export default function HomeScreen() {
   const router = useRouter();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true });
+  const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true, biometricEnabled: false, theme: 'dark', language: 'ar' });
   const [refreshing, setRefreshing] = useState(false);
-  const [chartView, setChartView] = useState<'pie' | 'bar'>('pie');
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [forecast, setForecast] = useState<any>(null);
+  const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
+  const [streak, setStreak] = useState(7);
+  const [earnedBadges, setEarnedBadges] = useState<string[]>(['first_expense', 'week_streak']);
+
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const greeting = getGreeting();
+
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'صباح الخير';
+    if (hour < 18) return 'مساء الخير';
+    return 'مساء النور';
+  }
 
   const loadData = async () => {
     try {
-      const [expensesData, settingsData] = await Promise.all([
-        expenseStorage.getAll(),
+      const [settingsData, expenses, incomes, forecastData] = await Promise.all([
         settingsStorage.get(),
+        expenseStorage.getByMonth(currentMonth),
+        incomeStorage.getByMonth(currentMonth),
+        financialAnalysis.getMonthlyForecast(currentMonth),
       ]);
-      setExpenses(expensesData);
+      
       setSettings(settingsData);
+      setTotalExpenses(expenses.reduce((sum, e) => sum + e.amount, 0));
+      setTotalIncome(incomes.reduce((sum, i) => sum + i.amount, 0));
+      setForecast(forecastData);
+      setRecentExpenses(expenses.slice(0, 5));
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -52,203 +79,307 @@ export default function ExpensesScreen() {
     setRefreshing(false);
   };
 
-  // Calculate totals
-  const todayTotal = expenses
-    .filter(e => isToday(e.date))
-    .reduce((sum, e) => sum + e.amount, 0);
-
-  const monthTotal = expenses
-    .filter(e => isThisMonth(e.date))
-    .reduce((sum, e) => sum + e.amount, 0);
-
-  // Pie chart data - group by category for this month
-  const monthExpenses = expenses.filter(e => isThisMonth(e.date));
-  const categoryTotals = CATEGORIES.reduce((acc, cat) => {
-    const total = monthExpenses
-      .filter(e => e.category === cat.id)
-      .reduce((sum, e) => sum + e.amount, 0);
-    if (total > 0) {
-      acc.push({
-        value: total,
-        color: COLORS.categoryColors[cat.id as keyof typeof COLORS.categoryColors] || COLORS.textMuted,
-        text: cat.label,
-        label: cat.label,
-      });
-    }
-    return acc;
-  }, [] as { value: number; color: string; text: string; label: string }[]);
-
-  // Bar chart data - last 7 days
-  const last7Days = getDatesBetween(getDaysAgo(6), new Date());
-  const barData = last7Days.map(dateStr => {
-    const dayTotal = expenses
-      .filter(e => e.date.split('T')[0] === dateStr)
-      .reduce((sum, e) => sum + e.amount, 0);
-    const dayName = new Date(dateStr).toLocaleDateString('ar-SA', { weekday: 'short' });
-    return {
-      value: dayTotal,
-      label: dayName,
-      frontColor: COLORS.primary,
-    };
-  });
-
-  const handleDelete = async (id: string) => {
-    await expenseStorage.delete(id);
-    loadData();
-  };
-
-  const getCategoryLabel = (categoryId: string) => {
-    return CATEGORIES.find(c => c.id === categoryId)?.label || 'أخرى';
-  };
-
-  const getCategoryColor = (categoryId: string) => {
-    return COLORS.categoryColors[categoryId as keyof typeof COLORS.categoryColors] || COLORS.textMuted;
-  };
+  const balance = totalIncome - totalExpenses;
+  const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Summary Cards */}
-        <View style={styles.summaryRow}>
-          <Card style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>اليوم</Text>
-            <Text style={styles.summaryValue}>{formatCurrency(todayTotal, settings.currency)}</Text>
-          </Card>
-          <Card style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>هذا الشهر</Text>
-            <Text style={[styles.summaryValue, { color: COLORS.warning }]}>
-              {formatCurrency(monthTotal, settings.currency)}
-            </Text>
-          </Card>
-        </View>
-
-        {/* Chart Toggle */}
-        {expenses.length > 0 && (
-          <View style={styles.chartContainer}>
-            <View style={styles.chartToggle}>
-              <TouchableOpacity
-                style={[styles.toggleButton, chartView === 'pie' && styles.toggleButtonActive]}
-                onPress={() => setChartView('pie')}
-              >
-                <Text style={[styles.toggleText, chartView === 'pie' && styles.toggleTextActive]}>
-                  حسب الفئة
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.toggleButton, chartView === 'bar' && styles.toggleButtonActive]}
-                onPress={() => setChartView('bar')}
-              >
-                <Text style={[styles.toggleText, chartView === 'bar' && styles.toggleTextActive]}>
-                  آخر 7 أيام
-                </Text>
-              </TouchableOpacity>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <Animated.View entering={FadeInDown.delay(100)} style={styles.header}>
+            <View style={styles.headerLeft}>
+              <Text style={styles.greeting}>{greeting} 👋</Text>
+              <Text style={styles.headerTitle}>مصروفي</Text>
             </View>
-
-            {chartView === 'pie' && categoryTotals.length > 0 ? (
-              <View style={styles.pieChartWrapper}>
-                <PieChart
-                  data={categoryTotals}
-                  donut
-                  radius={80}
-                  innerRadius={50}
-                  centerLabelComponent={() => (
-                    <View style={styles.pieCenter}>
-                      <Text style={styles.pieCenterLabel}>الإجمالي</Text>
-                      <Text style={styles.pieCenterValue}>
-                        {formatCurrency(monthTotal, settings.currency)}
-                      </Text>
-                    </View>
-                  )}
-                />
-                <View style={styles.legendContainer}>
-                  {categoryTotals.map((item, index) => (
-                    <View key={index} style={styles.legendItem}>
-                      <View style={[styles.legendDot, { backgroundColor: item.color }]} />
-                      <Text style={styles.legendText}>{item.label}</Text>
-                      <Text style={styles.legendValue}>
-                        {formatCurrency(item.value, settings.currency)}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            ) : chartView === 'bar' ? (
-              <View style={styles.barChartWrapper}>
-                <BarChart
-                  data={barData}
-                  barWidth={30}
-                  spacing={15}
-                  xAxisColor={COLORS.border}
-                  yAxisColor={COLORS.border}
-                  yAxisTextStyle={{ color: COLORS.textSecondary, fontSize: 10 }}
-                  xAxisLabelTextStyle={{ color: COLORS.textSecondary, fontSize: 10 }}
-                  noOfSections={4}
-                  maxValue={Math.max(...barData.map(d => d.value)) * 1.2 || 100}
-                  height={150}
-                  width={screenWidth - 100}
-                  isAnimated
-                />
-              </View>
-            ) : (
-              <Text style={styles.noChartData}>لا توجد بيانات كافية للرسم البياني</Text>
-            )}
-          </View>
-        )}
-
-        {/* Expense List */}
-        <View style={styles.listSection}>
-          <Text style={styles.sectionTitle}>آخر المصروفات</Text>
-          {expenses.length === 0 ? (
-            <EmptyState
-              icon="receipt-outline"
-              title="لا يوجد مصروفات بعد"
-              subtitle="اضغط على + لإضافة مصروف جديد"
-            />
-          ) : (
-            expenses.slice(0, 20).map(expense => (
-              <TouchableOpacity
-                key={expense.id}
-                style={styles.expenseItem}
-                onLongPress={() => handleDelete(expense.id)}
+            <TouchableOpacity 
+              style={styles.notificationButton}
+              onPress={() => router.push('/more')}
+            >
+              <LinearGradient
+                colors={[COLORS.glass, COLORS.backgroundGlass]}
+                style={styles.notificationGradient}
               >
-                <View style={[styles.categoryIcon, { backgroundColor: getCategoryColor(expense.category) }]}>
-                  <Ionicons
-                    name={CATEGORIES.find(c => c.id === expense.category)?.icon as any || 'ellipsis-horizontal'}
-                    size={20}
-                    color={COLORS.white}
-                  />
-                </View>
-                <View style={styles.expenseDetails}>
-                  <Text style={styles.expenseTitle}>{expense.title}</Text>
-                  <Text style={styles.expenseCategory}>
-                    {getCategoryLabel(expense.category)} • {formatDate(expense.date)}
+                <Ionicons name="notifications-outline" size={22} color={COLORS.text} />
+                <View style={styles.notificationBadge} />
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Main Balance Card */}
+          <Animated.View entering={FadeInDown.delay(200)}>
+            <LinearGradient
+              colors={COLORS.gradients.primary}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.balanceCard}
+            >
+              <View style={styles.balanceHeader}>
+                <Text style={styles.balanceLabel}>الرصيد المتبقي</Text>
+                <View style={styles.monthBadge}>
+                  <Text style={styles.monthText}>
+                    {new Date().toLocaleDateString('ar-SA', { month: 'short' })}
                   </Text>
                 </View>
-                <Text style={styles.expenseAmount}>
-                  {formatCurrency(expense.amount, settings.currency)}
-                </Text>
-              </TouchableOpacity>
-            ))
-          )}
-        </View>
-      </ScrollView>
+              </View>
+              
+              <Text style={styles.balanceAmount}>
+                {formatCurrency(balance, settings.currency)}
+              </Text>
+              
+              <View style={styles.balanceStats}>
+                <View style={styles.balanceStat}>
+                  <View style={styles.statIconUp}>
+                    <Ionicons name="arrow-up" size={14} color={COLORS.secondary} />
+                  </View>
+                  <View>
+                    <Text style={styles.statLabel}>الدخل</Text>
+                    <Text style={styles.statValue}>{formatCurrency(totalIncome, settings.currency)}</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.balanceDivider} />
+                
+                <View style={styles.balanceStat}>
+                  <View style={styles.statIconDown}>
+                    <Ionicons name="arrow-down" size={14} color={COLORS.danger} />
+                  </View>
+                  <View>
+                    <Text style={styles.statLabel}>المصروفات</Text>
+                    <Text style={styles.statValue}>{formatCurrency(totalExpenses, settings.currency)}</Text>
+                  </View>
+                </View>
+              </View>
 
-      {/* FAB */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push('/expense/add')}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="add" size={28} color={COLORS.white} />
-      </TouchableOpacity>
-    </SafeAreaView>
+              {/* Decorative Elements */}
+              <View style={styles.decorCircle1} />
+              <View style={styles.decorCircle2} />
+            </LinearGradient>
+          </Animated.View>
+
+          {/* Quick Actions */}
+          <Animated.View entering={FadeInDown.delay(300)} style={styles.quickActions}>
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => router.push('/expense/add')}
+            >
+              <LinearGradient
+                colors={[COLORS.danger + '20', COLORS.danger + '10']}
+                style={styles.quickActionIcon}
+              >
+                <Ionicons name="remove-circle" size={24} color={COLORS.danger} />
+              </LinearGradient>
+              <Text style={styles.quickActionText}>مصروف</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => router.push('/income/add')}
+            >
+              <LinearGradient
+                colors={[COLORS.secondary + '20', COLORS.secondary + '10']}
+                style={styles.quickActionIcon}
+              >
+                <Ionicons name="add-circle" size={24} color={COLORS.secondary} />
+              </LinearGradient>
+              <Text style={styles.quickActionText}>دخل</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => router.push('/analytics')}
+            >
+              <LinearGradient
+                colors={[COLORS.primary + '20', COLORS.primary + '10']}
+                style={styles.quickActionIcon}
+              >
+                <Ionicons name="analytics" size={24} color={COLORS.primary} />
+              </LinearGradient>
+              <Text style={styles.quickActionText}>تحليل</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => router.push('/more')}
+            >
+              <LinearGradient
+                colors={[COLORS.accent + '20', COLORS.accent + '10']}
+                style={styles.quickActionIcon}
+              >
+                <Ionicons name="grid" size={24} color={COLORS.accent} />
+              </LinearGradient>
+              <Text style={styles.quickActionText}>المزيد</Text>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Streak & Challenge Card */}
+          <Animated.View entering={FadeInDown.delay(400)}>
+            <LinearGradient
+              colors={COLORS.gradients.sunset}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.streakCard}
+            >
+              <View style={styles.streakContent}>
+                <View style={styles.streakInfo}>
+                  <View style={styles.streakIconContainer}>
+                    <Ionicons name="flame" size={28} color={COLORS.white} />
+                  </View>
+                  <View>
+                    <Text style={styles.streakTitle}>{streak} يوم متواصل 🔥</Text>
+                    <Text style={styles.streakSubtitle}>استمر في تسجيل مصاريفك!</Text>
+                  </View>
+                </View>
+                <TouchableOpacity style={styles.streakButton}>
+                  <Text style={styles.streakButtonText}>التحديات</Text>
+                  <Ionicons name="chevron-back" size={16} color={COLORS.white} />
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </Animated.View>
+
+          {/* Insights Cards */}
+          <View style={styles.sectionHeader}>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={styles.seeAllText}>عرض الكل</Text>
+              <Ionicons name="chevron-back" size={16} color={COLORS.primary} />
+            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>نظرة سريعة</Text>
+          </View>
+
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.insightsScroll}
+          >
+            <Animated.View entering={FadeInRight.delay(500)}>
+              <LinearGradient
+                colors={[COLORS.secondary + '20', COLORS.secondary + '10']}
+                style={styles.insightCard}
+              >
+                <View style={[styles.insightIcon, { backgroundColor: COLORS.secondary + '30' }]}>
+                  <Ionicons name="trending-up" size={20} color={COLORS.secondary} />
+                </View>
+                <Text style={styles.insightValue}>{savingsRate}%</Text>
+                <Text style={styles.insightLabel}>نسبة التوفير</Text>
+              </LinearGradient>
+            </Animated.View>
+
+            <Animated.View entering={FadeInRight.delay(600)}>
+              <LinearGradient
+                colors={[COLORS.primary + '20', COLORS.primary + '10']}
+                style={styles.insightCard}
+              >
+                <View style={[styles.insightIcon, { backgroundColor: COLORS.primary + '30' }]}>
+                  <Ionicons name="calendar" size={20} color={COLORS.primary} />
+                </View>
+                <Text style={styles.insightValue}>{forecast?.recurringExpenses || 0}</Text>
+                <Text style={styles.insightLabel}>مصاريف ثابتة</Text>
+              </LinearGradient>
+            </Animated.View>
+
+            <Animated.View entering={FadeInRight.delay(700)}>
+              <LinearGradient
+                colors={[COLORS.accent + '20', COLORS.accent + '10']}
+                style={styles.insightCard}
+              >
+                <View style={[styles.insightIcon, { backgroundColor: COLORS.accent + '30' }]}>
+                  <Ionicons name="trophy" size={20} color={COLORS.accent} />
+                </View>
+                <Text style={styles.insightValue}>{earnedBadges.length}</Text>
+                <Text style={styles.insightLabel}>إنجازات</Text>
+              </LinearGradient>
+            </Animated.View>
+          </ScrollView>
+
+          {/* Recent Transactions */}
+          <View style={styles.sectionHeader}>
+            <TouchableOpacity 
+              style={styles.seeAllButton}
+              onPress={() => router.push('/wallet')}
+            >
+              <Text style={styles.seeAllText}>عرض الكل</Text>
+              <Ionicons name="chevron-back" size={16} color={COLORS.primary} />
+            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>آخر المعاملات</Text>
+          </View>
+
+          <Animated.View entering={FadeInDown.delay(800)} style={styles.transactionsList}>
+            {recentExpenses.length > 0 ? (
+              recentExpenses.map((expense, index) => (
+                <TouchableOpacity key={expense.id} style={styles.transactionItem}>
+                  <View style={[styles.transactionIcon, { backgroundColor: COLORS.categoryColors[expense.category as keyof typeof COLORS.categoryColors] + '20' }]}>
+                    <Ionicons 
+                      name="receipt-outline" 
+                      size={20} 
+                      color={COLORS.categoryColors[expense.category as keyof typeof COLORS.categoryColors] || COLORS.primary} 
+                    />
+                  </View>
+                  <View style={styles.transactionInfo}>
+                    <Text style={styles.transactionTitle}>{expense.title}</Text>
+                    <Text style={styles.transactionDate}>
+                      {new Date(expense.date).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })}
+                    </Text>
+                  </View>
+                  <Text style={[styles.transactionAmount, { color: COLORS.danger }]}>
+                    -{formatCurrency(expense.amount, settings.currency)}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Ionicons name="receipt-outline" size={40} color={COLORS.textMuted} />
+                <Text style={styles.emptyText}>لا توجد معاملات بعد</Text>
+                <TouchableOpacity 
+                  style={styles.emptyButton}
+                  onPress={() => router.push('/expense/add')}
+                >
+                  <Text style={styles.emptyButtonText}>أضف أول مصروف</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </Animated.View>
+
+          {/* AI Tip */}
+          <Animated.View entering={FadeInDown.delay(900)}>
+            <TouchableOpacity onPress={() => router.push('/analytics')}>
+              <LinearGradient
+                colors={[COLORS.backgroundGlass, COLORS.glass]}
+                style={styles.tipCard}
+              >
+                <View style={styles.tipHeader}>
+                  <View style={styles.tipIconContainer}>
+                    <Ionicons name="sparkles" size={20} color={COLORS.accent} />
+                  </View>
+                  <Text style={styles.tipTitle}>نصيحة ذكية</Text>
+                </View>
+                <Text style={styles.tipText}>
+                  {balance >= 0 
+                    ? `أحسنت! لديك ${formatCurrency(balance, settings.currency)} متبقي. حاول ادخار جزء منه.`
+                    : `تنبيه: أنت تنفق أكثر من دخلك بـ ${formatCurrency(Math.abs(balance), settings.currency)}`
+                  }
+                </Text>
+                <View style={styles.tipFooter}>
+                  <Text style={styles.tipAction}>اطلب تحليل مفصّل</Text>
+                  <Ionicons name="chevron-back" size={16} color={COLORS.primary} />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Bottom Spacing */}
+          <View style={{ height: 100 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -257,181 +388,376 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  safeArea: {
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: SPACING.md,
-    paddingBottom: 100,
   },
-  summaryRow: {
+  header: {
     flexDirection: 'row',
-    gap: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  summaryCard: {
-    flex: 1,
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  summaryLabel: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-  },
-  summaryValue: {
-    fontSize: FONT_SIZES.xl,
-    fontWeight: '700',
-    color: COLORS.secondary,
-  },
-  chartContainer: {
     marginBottom: SPACING.lg,
   },
-  chartToggle: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.md,
-    padding: 4,
-    marginBottom: SPACING.md,
-  },
-  toggleButton: {
+  headerLeft: {
     flex: 1,
-    paddingVertical: SPACING.sm,
-    alignItems: 'center',
-    borderRadius: BORDER_RADIUS.sm,
   },
-  toggleButtonActive: {
-    backgroundColor: COLORS.primary,
-  },
-  toggleText: {
-    fontSize: FONT_SIZES.sm,
+  greeting: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
-    fontWeight: '500',
   },
-  toggleTextActive: {
-    color: COLORS.white,
-  },
-  pieChartWrapper: {
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundLight,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
-  },
-  pieCenter: {
-    alignItems: 'center',
-  },
-  pieCenterLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textMuted,
-  },
-  pieCenterValue: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '700',
+  headerTitle: {
+    fontSize: FONT_SIZES.xxl,
+    fontFamily: FONTS.bold,
     color: COLORS.text,
   },
-  legendContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  notificationButton: {
+    width: 44,
+    height: 44,
+  },
+  notificationGradient: {
+    flex: 1,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
     justifyContent: 'center',
-    marginTop: SPACING.md,
-    gap: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.sm,
+  notificationBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.danger,
   },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginLeft: SPACING.xs,
-  },
-  legendText: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    marginLeft: SPACING.xs,
-  },
-  legendValue: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.text,
-    fontWeight: '600',
-  },
-  barChartWrapper: {
-    alignItems: 'center',
-    backgroundColor: COLORS.backgroundLight,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.md,
+  balanceCard: {
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
     overflow: 'hidden',
   },
-  noChartData: {
-    textAlign: 'center',
-    color: COLORS.textMuted,
-    fontSize: FONT_SIZES.sm,
-    padding: SPACING.lg,
+  balanceHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  listSection: {
+  balanceLabel: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.regular,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  monthBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  monthText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.medium,
+    color: COLORS.white,
+  },
+  balanceAmount: {
+    fontSize: FONT_SIZES.hero,
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
+    marginBottom: SPACING.lg,
+  },
+  balanceStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+  },
+  balanceStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  statIconUp: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.secondary + '30',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statIconDown: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.danger + '30',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statLabel: {
+    fontSize: FONT_SIZES.xs,
+    fontFamily: FONTS.regular,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  statValue: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.white,
+  },
+  balanceDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  decorCircle1: {
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  decorCircle2: {
+    position: 'absolute',
+    bottom: -30,
+    left: -30,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.lg,
+  },
+  quickAction: {
+    alignItems: 'center',
     flex: 1,
+  },
+  quickActionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: BORDER_RADIUS.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.xs,
+  },
+  quickActionText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+  },
+  streakCard: {
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  streakContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  streakInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  streakIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  streakTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
+  },
+  streakSubtitle: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  streakButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.xs,
+  },
+  streakButtonText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.medium,
+    color: COLORS.white,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
   },
   sectionTitle: {
     fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     color: COLORS.text,
-    marginBottom: SPACING.md,
-    textAlign: 'right',
   },
-  expenseItem: {
+  seeAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.backgroundLight,
-    borderRadius: BORDER_RADIUS.md,
+    gap: SPACING.xs,
+  },
+  seeAllText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.medium,
+    color: COLORS.primary,
+  },
+  insightsScroll: {
+    paddingBottom: SPACING.md,
+    gap: SPACING.md,
+  },
+  insightCard: {
+    width: 120,
     padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginLeft: SPACING.sm,
+  },
+  insightIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: SPACING.sm,
   },
-  categoryIcon: {
+  insightValue: {
+    fontSize: FONT_SIZES.xxl,
+    fontFamily: FONTS.bold,
+    color: COLORS.text,
+  },
+  insightLabel: {
+    fontSize: FONT_SIZES.xs,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+  },
+  transactionsList: {
+    backgroundColor: COLORS.backgroundCard,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.lg,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  transactionIcon: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  expenseDetails: {
+  transactionInfo: {
     flex: 1,
     marginRight: SPACING.md,
   },
-  expenseTitle: {
+  transactionTitle: {
     fontSize: FONT_SIZES.md,
-    fontWeight: '600',
+    fontFamily: FONTS.medium,
     color: COLORS.text,
     textAlign: 'right',
   },
-  expenseCategory: {
+  transactionDate: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginTop: 2,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
     textAlign: 'right',
   },
-  expenseAmount: {
+  transactionAmount: {
     fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.danger,
+    fontFamily: FONTS.bold,
   },
-  fab: {
-    position: 'absolute',
-    left: SPACING.lg,
-    bottom: SPACING.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  emptyState: {
+    alignItems: 'center',
+    padding: SPACING.xl,
+  },
+  emptyText: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
+    marginTop: SPACING.md,
+  },
+  emptyButton: {
+    marginTop: SPACING.md,
     backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  emptyButtonText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.white,
+  },
+  tipCard: {
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
+  },
+  tipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginBottom: SPACING.sm,
+  },
+  tipIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.accent + '20',
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 4,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+  },
+  tipTitle: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.accent,
+  },
+  tipText: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.regular,
+    color: COLORS.text,
+    lineHeight: 24,
+    textAlign: 'right',
+    marginBottom: SPACING.md,
+  },
+  tipFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: SPACING.xs,
+  },
+  tipAction: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.medium,
+    color: COLORS.primary,
   },
 });

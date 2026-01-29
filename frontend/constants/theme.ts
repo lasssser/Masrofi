@@ -44,6 +44,13 @@ export const COLORS = {
   },
 };
 
+export const FONTS = {
+  regular: 'Cairo_400Regular',
+  medium: 'Cairo_500Medium',
+  semiBold: 'Cairo_600SemiBold',
+  bold: 'Cairo_700Bold',
+};
+
 export const SPACING = {
   xs: 4,
   sm: 8,

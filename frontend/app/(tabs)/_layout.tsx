@@ -3,16 +3,14 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONTS } from '../../constants/theme';
 
 export default function TabLayout() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   
-  // Calculate tab bar height based on safe area
-  const tabBarHeight = Platform.OS === 'android' ? 65 + insets.bottom : 65;
-  const tabBarPaddingBottom = Platform.OS === 'android' ? 10 + insets.bottom : 8;
+  // Fixed tab bar height with extra padding for Android navigation bar
+  const tabBarHeight = Platform.OS === 'android' ? 75 : 65;
+  const tabBarPaddingBottom = Platform.OS === 'android' ? 15 : 8;
 
   return (
     <Tabs

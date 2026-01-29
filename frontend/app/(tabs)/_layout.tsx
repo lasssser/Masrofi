@@ -17,12 +17,12 @@ export default function TabLayout() {
           backgroundColor: COLORS.backgroundLight,
           borderTopColor: COLORS.border,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: 70,
+          paddingBottom: 10,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
           fontFamily: FONTS.semiBold,
         },
         headerStyle: {
@@ -46,10 +46,30 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'المصروف',
+          title: 'المصروفات',
           headerTitle: 'مصروفي',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="wallet-outline" size={size} color={color} />
+            <Ionicons name="wallet-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="budget"
+        options={{
+          title: 'الميزانية',
+          headerTitle: 'الميزانية الشهرية',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calculator-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="savings"
+        options={{
+          title: 'الادخار',
+          headerTitle: 'أهداف الادخار',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trending-up-outline" size={22} color={color} />
           ),
         }}
       />
@@ -59,17 +79,27 @@ export default function TabLayout() {
           title: 'الديون',
           headerTitle: 'الديون',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people-outline" size={size} color={color} />
+            <Ionicons name="people-outline" size={22} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="shopping"
         options={{
-          title: 'المشتريات',
-          headerTitle: 'المشتريات',
+          title: 'التسوق',
+          headerTitle: 'قوائم التسوق',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cart-outline" size={size} color={color} />
+            <Ionicons name="cart-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="stats"
+        options={{
+          title: 'الإحصائيات',
+          headerTitle: 'الإحصائيات والتقارير',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="stats-chart-outline" size={22} color={color} />
           ),
         }}
       />

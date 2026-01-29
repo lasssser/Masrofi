@@ -28,7 +28,8 @@ import {
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 
-const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || '';
+// Production API URL - Wethaq Server
+const API_URL = 'http://45.9.191.190/masrofi-api';
 
 interface AIAnalysis {
   analysis: string;

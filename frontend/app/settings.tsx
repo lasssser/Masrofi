@@ -12,13 +12,15 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS } from '../constants/theme';
 import { settingsStorage, Settings, CURRENCIES, backupStorage } from '../utils/storage';
 import { requestNotificationPermissions } from '../utils/notifications';
 import Card from '../components/Card';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true });
   const [loading, setLoading] = useState(false);
 
@@ -69,14 +71,12 @@ export default function SettingsScreen() {
       const data = await backupStorage.exportAll();
       
       if (Platform.OS === 'web') {
-        // For web, copy to clipboard
         await Clipboard.setStringAsync(data);
         Alert.alert('نجاح', 'تم نسخ البيانات إلى الحافظة. يمكنك لصقها في ملف نصي.');
       } else {
-        // For mobile, use share
         await Share.share({
           message: data,
-          title: 'نسخة احتياطية - بيتي باجت',
+          title: 'نسخة احتياطية - مصروفي',
         });
       }
     } catch (error) {
@@ -111,8 +111,6 @@ export default function SettingsScreen() {
       'plain-text'
     );
   };
-
-  const currentCurrency = CURRENCIES.find(c => c.code === settings.currency);
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -209,16 +207,46 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </Card>
 
+        {/* Support Section */}
+        <Card style={styles.section}>
+          <TouchableOpacity
+            style={styles.supportButton}
+            onPress={() => router.push('/support')}
+          >
+            <View style={styles.supportButtonContent}>
+              <View>
+                <Text style={styles.supportButtonText}>الدعم ومعلومات التطبيق</Text>
+                <Text style={styles.supportButtonDescription}>
+                  تواصل معنا • عن التطبيق
+                </Text>
+              </View>
+              <Ionicons name="help-circle-outline" size={24} color={COLORS.primary} />
+            </View>
+            <Ionicons name="chevron-back" size={20} color={COLORS.textMuted} />
+          </TouchableOpacity>
+        </Card>
+
         {/* App Info */}
         <Card style={styles.section}>
           <View style={styles.appInfo}>
-            <Text style={styles.appName}>بيتي باجِت</Text>
+            <Text style={styles.appName}>Masrofi</Text>
+            <Text style={styles.appSubName}>by Wethaq Digital Solutions</Text>
+            <View style={styles.betaBadge}>
+              <Text style={styles.betaText}>نسخة تجريبية</Text>
+            </View>
             <Text style={styles.appVersion}>الإصدار 1.0.0</Text>
-            <Text style={styles.appDescription}>
-              تطبيق إدارة الميزانية الشخصية
-            </Text>
           </View>
         </Card>
+
+        {/* Copyright */}
+        <View style={styles.copyrightContainer}>
+          <Text style={styles.copyrightText}>
+            © 2026 Wethaq Digital Solutions.
+          </Text>
+          <Text style={styles.copyrightText}>
+            All rights reserved.
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -247,7 +275,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
     color: COLORS.text,
     flex: 1,
     textAlign: 'right',
@@ -271,7 +299,7 @@ const styles = StyleSheet.create({
   },
   currencySymbol: {
     fontSize: FONT_SIZES.xxl,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     color: COLORS.textSecondary,
     marginBottom: SPACING.xs,
   },
@@ -280,6 +308,7 @@ const styles = StyleSheet.create({
   },
   currencyLabel: {
     fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.textMuted,
   },
   currencyLabelActive: {
@@ -295,12 +324,13 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: FONT_SIZES.md,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
     color: COLORS.text,
     textAlign: 'right',
   },
   settingDescription: {
     fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     marginTop: 2,
     textAlign: 'right',
@@ -318,13 +348,37 @@ const styles = StyleSheet.create({
   },
   backupButtonText: {
     fontSize: FONT_SIZES.md,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
     color: COLORS.text,
   },
   backupButtonDescription: {
     fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     marginTop: SPACING.xs,
+    textAlign: 'right',
+  },
+  supportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  supportButtonContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  supportButtonText: {
+    fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.text,
+    textAlign: 'right',
+  },
+  supportButtonDescription: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
+    marginTop: 2,
     textAlign: 'right',
   },
   appInfo: {
@@ -333,17 +387,42 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: FONT_SIZES.xl,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     color: COLORS.primary,
-    marginBottom: SPACING.xs,
+  },
+  appSubName: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  betaBadge: {
+    backgroundColor: COLORS.warning + '30',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+    marginTop: SPACING.sm,
+  },
+  betaText: {
+    fontSize: FONT_SIZES.xs,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.warning,
   },
   appVersion: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.sm,
-  },
-  appDescription: {
-    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
     color: COLORS.textMuted,
+    marginTop: SPACING.sm,
+  },
+  copyrightContainer: {
+    alignItems: 'center',
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.md,
+  },
+  copyrightText: {
+    fontSize: FONT_SIZES.sm,
+    fontFamily: FONTS.regular,
+    color: COLORS.textMuted,
+    textAlign: 'center',
   },
 });

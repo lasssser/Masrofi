@@ -220,6 +220,7 @@ export default function AddDebtScreen() {
             style={styles.saveButton}
           />
         </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

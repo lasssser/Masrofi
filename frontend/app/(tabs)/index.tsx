@@ -24,6 +24,7 @@ import {
   financialAnalysis,
 } from '../../utils/storage';
 import { formatCurrency, formatTransactionAmount } from '../../utils/helpers';
+import { streakStorage, achievementStorage } from '../../utils/achievements';
 import AIChatModal from '../../components/AIChatModal';
 
 const { width } = Dimensions.get('window');

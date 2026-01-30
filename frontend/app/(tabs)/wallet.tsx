@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useTheme } from '../../context/ThemeContext';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS, CATEGORIES } from '../../constants/theme';
 import {
   expenseStorage,
@@ -30,6 +31,7 @@ type Transaction = (Expense | Income) & { type: 'expense' | 'income' };
 
 export default function WalletScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true, biometricEnabled: false, theme: 'dark', language: 'ar' });
   const [refreshing, setRefreshing] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);

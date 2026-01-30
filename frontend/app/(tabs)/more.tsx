@@ -92,9 +92,17 @@ const menuItems: MenuItem[] = [
 
 const settingsItems: MenuItem[] = [
   {
+    id: 'themes',
+    title: 'المظهر والثيمات',
+    subtitle: 'تغيير ألوان التطبيق',
+    icon: 'color-palette',
+    color: '#8B5CF6',
+    route: '/themes',
+  },
+  {
     id: 'settings',
     title: 'الإعدادات',
-    subtitle: 'العملة، الإشعارات، المظهر',
+    subtitle: 'العملة، الإشعارات، البصمة',
     icon: 'settings',
     color: COLORS.textSecondary,
     route: '/settings',

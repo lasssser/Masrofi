@@ -23,7 +23,7 @@ import {
   Settings,
   financialAnalysis,
 } from '../../utils/storage';
-import { formatCurrency } from '../../utils/helpers';
+import { formatCurrency, formatTransactionAmount } from '../../utils/helpers';
 import AIChatModal from '../../components/AIChatModal';
 
 const { width } = Dimensions.get('window');
@@ -331,7 +331,7 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                   <Text style={[styles.transactionAmount, { color: COLORS.danger }]}>
-                    -{formatCurrency(expense.amount, settings.currency)}
+                    -{formatTransactionAmount(expense.amount, expense.currency, settings.currency)}
                   </Text>
                 </TouchableOpacity>
               ))

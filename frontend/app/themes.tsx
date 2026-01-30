@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,49 +6,49 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS } from '../constants/theme';
-import { themeOptions, ThemeType, themes, setTheme } from '../utils/themes';
-import { settingsStorage } from '../utils/storage';
+import { useTheme, themeOptions, themes, ThemeType } from '../context/ThemeContext';
+import { SPACING, FONT_SIZES, BORDER_RADIUS, FONTS } from '../constants/theme';
 
 export default function ThemesScreen() {
   const router = useRouter();
-  const [selectedTheme, setSelectedTheme] = useState<ThemeType>('dark');
+  const { theme, colors, setTheme } = useTheme();
   const [saving, setSaving] = useState(false);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadCurrentTheme();
-    }, [])
-  );
-
-  const loadCurrentTheme = async () => {
-    const settings = await settingsStorage.get();
-    setSelectedTheme((settings.theme as ThemeType) || 'dark');
-  };
 
   const handleSelectTheme = async (themeId: ThemeType) => {
     setSaving(true);
-    setSelectedTheme(themeId);
-    await setTheme(themeId);
+    try {
+      await setTheme(themeId);
+      // Show success message
+      setTimeout(() => {
+        Alert.alert(
+          'تم التغيير ✓',
+          'تم تغيير الثيم بنجاح. بعض الشاشات قد تحتاج لإعادة الفتح لرؤية التغيير.',
+          [{ text: 'حسناً' }]
+        );
+      }, 300);
+    } catch (error) {
+      Alert.alert('خطأ', 'فشل تغيير الثيم');
+    }
     setSaving(false);
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <StatusBar barStyle={theme === 'light' ? 'dark-content' : 'light-content'} />
       
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-forward" size={24} color={COLORS.text} />
+          <Ionicons name="arrow-forward" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>المظهر</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>المظهر</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -60,61 +60,65 @@ export default function ThemesScreen() {
         {/* Current Theme Preview */}
         <Animated.View entering={FadeInDown.delay(100)}>
           <LinearGradient
-            colors={themes[selectedTheme].gradients.primary}
+            colors={colors.gradients.primary}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.previewCard}
           >
             <Text style={styles.previewLabel}>الثيم الحالي</Text>
             <Text style={styles.previewTitle}>
-              {themeOptions.find(t => t.id === selectedTheme)?.label || 'داكن'}
+              {themeOptions.find(t => t.id === theme)?.label || 'داكن'}
             </Text>
             <View style={styles.previewColors}>
-              <View style={[styles.previewColor, { backgroundColor: themes[selectedTheme].background }]} />
-              <View style={[styles.previewColor, { backgroundColor: themes[selectedTheme].backgroundLight }]} />
-              <View style={[styles.previewColor, { backgroundColor: themes[selectedTheme].surface }]} />
-              <View style={[styles.previewColor, { backgroundColor: themes[selectedTheme].primary }]} />
-              <View style={[styles.previewColor, { backgroundColor: themes[selectedTheme].secondary }]} />
+              <View style={[styles.previewColor, { backgroundColor: colors.background }]} />
+              <View style={[styles.previewColor, { backgroundColor: colors.backgroundLight }]} />
+              <View style={[styles.previewColor, { backgroundColor: colors.surface }]} />
+              <View style={[styles.previewColor, { backgroundColor: colors.primary }]} />
+              <View style={[styles.previewColor, { backgroundColor: colors.secondary }]} />
             </View>
           </LinearGradient>
         </Animated.View>
 
         {/* Theme Options */}
-        <Text style={styles.sectionTitle}>اختر الثيم</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>اختر الثيم</Text>
         
         <View style={styles.themesGrid}>
-          {themeOptions.map((theme, index) => (
+          {themeOptions.map((themeOption, index) => (
             <Animated.View
-              key={theme.id}
+              key={themeOption.id}
               entering={FadeInDown.delay(200 + index * 50)}
               style={styles.themeCardWrapper}
             >
               <TouchableOpacity
                 style={[
                   styles.themeCard,
-                  selectedTheme === theme.id && styles.themeCardSelected,
+                  { 
+                    backgroundColor: colors.surface,
+                    borderColor: theme === themeOption.id ? colors.primary : 'transparent',
+                  },
                 ]}
-                onPress={() => handleSelectTheme(theme.id)}
+                onPress={() => handleSelectTheme(themeOption.id)}
                 activeOpacity={0.7}
+                disabled={saving}
               >
                 <LinearGradient
-                  colors={theme.preview}
+                  colors={themeOption.preview}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.themePreview}
                 >
                   <Ionicons
-                    name={theme.icon as any}
+                    name={themeOption.icon as any}
                     size={32}
                     color="#FFFFFF"
                   />
                 </LinearGradient>
                 
-                <Text style={styles.themeName}>{theme.label}</Text>
+                <Text style={[styles.themeName, { color: colors.text }]}>{themeOption.label}</Text>
                 
-                {selectedTheme === theme.id && (
-                  <View style={styles.selectedBadge}>
-                    <Ionicons name="checkmark" size={14} color={COLORS.white} />
+                {theme === themeOption.id && (
+                  <View style={[styles.selectedBadge, { backgroundColor: colors.primary }]}>
+                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
                   </View>
                 )}
               </TouchableOpacity>
@@ -123,10 +127,10 @@ export default function ThemesScreen() {
         </View>
 
         {/* Info */}
-        <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={24} color={COLORS.textMuted} />
-          <Text style={styles.infoText}>
-            تغيير الثيم سيُطبق على جميع شاشات التطبيق. قد تحتاج لإعادة تشغيل التطبيق لرؤية التغييرات بالكامل.
+        <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Ionicons name="information-circle" size={24} color={colors.textMuted} />
+          <Text style={[styles.infoText, { color: colors.textMuted }]}>
+            تغيير الثيم سيُطبق فوراً على جميع الشاشات. إذا لم ترى التغيير، حاول الخروج من الشاشة وفتحها مجدداً.
           </Text>
         </View>
       </ScrollView>
@@ -137,7 +141,6 @@ export default function ThemesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
@@ -155,7 +158,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: FONT_SIZES.lg,
     fontFamily: FONTS.bold,
-    color: COLORS.text,
   },
   scrollView: {
     flex: 1,
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
   previewTitle: {
     fontSize: FONT_SIZES.xxl,
     fontFamily: FONTS.bold,
-    color: COLORS.white,
+    color: '#FFFFFF',
     marginBottom: SPACING.md,
   },
   previewColors: {
@@ -196,7 +198,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FONT_SIZES.lg,
     fontFamily: FONTS.semiBold,
-    color: COLORS.text,
     marginBottom: SPACING.md,
     textAlign: 'right',
   },
@@ -210,15 +211,10 @@ const styles = StyleSheet.create({
     width: '47%',
   },
   themeCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  themeCardSelected: {
-    borderColor: COLORS.primary,
   },
   themePreview: {
     width: 80,
@@ -231,7 +227,6 @@ const styles = StyleSheet.create({
   themeName: {
     fontSize: FONT_SIZES.md,
     fontFamily: FONTS.semiBold,
-    color: COLORS.text,
   },
   selectedBadge: {
     position: 'absolute',
@@ -240,7 +235,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -248,17 +242,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: SPACING.sm,
-    backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   infoText: {
     flex: 1,
     fontSize: FONT_SIZES.sm,
     fontFamily: FONTS.regular,
-    color: COLORS.textMuted,
     textAlign: 'right',
     lineHeight: 20,
   },

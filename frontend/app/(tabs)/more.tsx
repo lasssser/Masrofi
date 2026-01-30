@@ -154,25 +154,27 @@ export default function MoreScreen() {
         >
           {/* Pro Banner */}
           <Animated.View entering={FadeInDown.delay(50)}>
-            <TouchableOpacity>
-              <LinearGradient
-                colors={COLORS.gradients.gold}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.proBanner}
-              >
-                <View style={styles.proContent}>
-                  <View style={styles.proIconContainer}>
-                    <Ionicons name="diamond" size={24} color={COLORS.white} />
-                  </View>
-                  <View style={styles.proInfo}>
-                    <Text style={styles.proTitle}>الترقية للنسخة الكاملة</Text>
-                    <Text style={styles.proSubtitle}>احصل على جميع المميزات</Text>
-                  </View>
+            <LinearGradient
+              colors={COLORS.gradients.gold}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.proBanner}
+            >
+              <View style={styles.proContent}>
+                <View style={styles.proIconContainer}>
+                  <Ionicons name="gift" size={24} color={COLORS.white} />
                 </View>
-                <Ionicons name="chevron-back" size={20} color={COLORS.white} />
-              </LinearGradient>
-            </TouchableOpacity>
+                <View style={styles.proInfo}>
+                  <View style={styles.proTitleRow}>
+                    <Text style={styles.proTitle}>مجاني حالياً!</Text>
+                    <View style={styles.freeBadge}>
+                      <Text style={styles.freeBadgeText}>FREE</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.proSubtitle}>قريباً: ميزات Pro مع ذكاء اصطناعي متطور 🚀</Text>
+                </View>
+              </View>
+            </LinearGradient>
           </Animated.View>
 
           {/* Main Menu */}
@@ -267,9 +269,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  proInfo: {},
+  proInfo: {
+    flex: 1,
+  },
+  proTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
   proTitle: {
     fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
+  },
+  freeBadge: {
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  freeBadgeText: {
+    fontSize: FONT_SIZES.xs,
     fontFamily: FONTS.bold,
     color: COLORS.white,
   },
@@ -277,6 +297,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     fontFamily: FONTS.regular,
     color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
   },
   section: {
     marginBottom: SPACING.lg,

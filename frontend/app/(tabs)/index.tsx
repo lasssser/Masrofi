@@ -25,6 +25,7 @@ import {
 } from '../../utils/storage';
 import { formatCurrency, formatTransactionAmount } from '../../utils/helpers';
 import { streakStorage, achievementStorage } from '../../utils/achievements';
+import { alertStorage } from '../../utils/alerts';
 import AIChatModal from '../../components/AIChatModal';
 
 const { width } = Dimensions.get('window');
@@ -42,6 +43,7 @@ export default function HomeScreen() {
   const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
   const [streak, setStreak] = useState(0);
   const [earnedBadges, setEarnedBadges] = useState<string[]>([]);
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const greeting = getGreeting();
@@ -55,13 +57,14 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      const [settingsData, expenses, incomes, forecastData, streakData, unlockedAchievements] = await Promise.all([
+      const [settingsData, expenses, incomes, forecastData, streakData, unlockedAchievements, alertsCount] = await Promise.all([
         settingsStorage.get(),
         expenseStorage.getByMonth(currentMonth),
         incomeStorage.getByMonth(currentMonth),
         financialAnalysis.getMonthlyForecast(currentMonth),
         streakStorage.get(),
         achievementStorage.getUnlocked(),
+        alertStorage.getUnreadCount(),
       ]);
       
       setSettings(settingsData);
@@ -71,6 +74,7 @@ export default function HomeScreen() {
       setRecentExpenses(expenses.slice(0, 5));
       setStreak(streakData.current);
       setEarnedBadges(unlockedAchievements.map(a => a.id));
+      setUnreadAlerts(alertsCount);
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -115,7 +119,13 @@ export default function HomeScreen() {
             >
               <View style={[styles.notificationGradient, { backgroundColor: colors.surface }]}>
                 <Ionicons name="notifications-outline" size={22} color={colors.text} />
-                <View style={[styles.notificationBadge, { backgroundColor: colors.danger }]} />
+                {unreadAlerts > 0 && (
+                  <View style={[styles.notificationBadge, { backgroundColor: colors.danger }]}>
+                    <Text style={styles.notificationBadgeText}>
+                      {unreadAlerts > 9 ? '9+' : unreadAlerts}
+                    </Text>
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
           </Animated.View>
@@ -445,12 +455,20 @@ const styles = StyleSheet.create({
   },
   notificationBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: 4,
+    right: 4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: COLORS.danger,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  notificationBadgeText: {
+    fontSize: 10,
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
   },
   balanceCard: {
     borderRadius: BORDER_RADIUS.xl,

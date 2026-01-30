@@ -112,14 +112,14 @@ export default function WalletScreen() {
         <View style={styles.summaryCards}>
           <Animated.View entering={FadeInDown.delay(100)} style={styles.summaryCard}>
             <LinearGradient
-              colors={[COLORS.secondary + '20', COLORS.secondary + '10']}
-              style={styles.summaryCardContent}
+              colors={[colors.secondary + '20', colors.secondary + '10']}
+              style={[styles.summaryCardContent, { borderColor: colors.border }]}
             >
-              <View style={[styles.summaryIcon, { backgroundColor: COLORS.secondary + '30' }]}>
-                <Ionicons name="arrow-up" size={18} color={COLORS.secondary} />
+              <View style={[styles.summaryIcon, { backgroundColor: colors.secondary + '30' }]}>
+                <Ionicons name="arrow-up" size={18} color={colors.secondary} />
               </View>
-              <Text style={styles.summaryLabel}>الدخل</Text>
-              <Text style={[styles.summaryValue, { color: COLORS.secondary }]}>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>الدخل</Text>
+              <Text style={[styles.summaryValue, { color: colors.secondary }]}>
                 {formatCurrency(totalIncome, settings.currency)}
               </Text>
             </LinearGradient>
@@ -127,14 +127,14 @@ export default function WalletScreen() {
 
           <Animated.View entering={FadeInDown.delay(200)} style={styles.summaryCard}>
             <LinearGradient
-              colors={[COLORS.danger + '20', COLORS.danger + '10']}
-              style={styles.summaryCardContent}
+              colors={[colors.danger + '20', colors.danger + '10']}
+              style={[styles.summaryCardContent, { borderColor: colors.border }]}
             >
-              <View style={[styles.summaryIcon, { backgroundColor: COLORS.danger + '30' }]}>
-                <Ionicons name="arrow-down" size={18} color={COLORS.danger} />
+              <View style={[styles.summaryIcon, { backgroundColor: colors.danger + '30' }]}>
+                <Ionicons name="arrow-down" size={18} color={colors.danger} />
               </View>
-              <Text style={styles.summaryLabel}>المصروفات</Text>
-              <Text style={[styles.summaryValue, { color: COLORS.danger }]}>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>المصروفات</Text>
+              <Text style={[styles.summaryValue, { color: colors.danger }]}>
                 {formatCurrency(totalExpenses, settings.currency)}
               </Text>
             </LinearGradient>
@@ -143,44 +143,44 @@ export default function WalletScreen() {
 
         {/* Search & Filter */}
         <Animated.View entering={FadeInDown.delay(300)} style={styles.searchSection}>
-          <View style={styles.searchContainer}>
-            <Ionicons name="search" size={20} color={COLORS.textMuted} />
+          <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Ionicons name="search" size={20} color={colors.textMuted} />
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: colors.text }]}
               placeholder="ابحث في المعاملات..."
-              placeholderTextColor={COLORS.textMuted}
+              placeholderTextColor={colors.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color={COLORS.textMuted} />
+                <Ionicons name="close-circle" size={20} color={colors.textMuted} />
               </TouchableOpacity>
             )}
           </View>
 
-          <View style={styles.filterTabs}>
+          <View style={[styles.filterTabs, { backgroundColor: colors.surface }]}>
             <TouchableOpacity
-              style={[styles.filterTab, filter === 'all' && styles.filterTabActive]}
+              style={[styles.filterTab, filter === 'all' && { backgroundColor: colors.primary }]}
               onPress={() => setFilter('all')}
             >
-              <Text style={[styles.filterTabText, filter === 'all' && styles.filterTabTextActive]}>
+              <Text style={[styles.filterTabText, { color: colors.textSecondary }, filter === 'all' && { color: colors.white }]}>
                 الكل
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.filterTab, filter === 'income' && styles.filterTabActive]}
+              style={[styles.filterTab, filter === 'income' && { backgroundColor: colors.primary }]}
               onPress={() => setFilter('income')}
             >
-              <Text style={[styles.filterTabText, filter === 'income' && styles.filterTabTextActive]}>
+              <Text style={[styles.filterTabText, { color: colors.textSecondary }, filter === 'income' && { color: colors.white }]}>
                 الدخل
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.filterTab, filter === 'expense' && styles.filterTabActive]}
+              style={[styles.filterTab, filter === 'expense' && { backgroundColor: colors.primary }]}
               onPress={() => setFilter('expense')}
             >
-              <Text style={[styles.filterTabText, filter === 'expense' && styles.filterTabTextActive]}>
+              <Text style={[styles.filterTabText, { color: colors.textSecondary }, filter === 'expense' && { color: colors.white }]}>
                 المصروفات
               </Text>
             </TouchableOpacity>
@@ -192,7 +192,7 @@ export default function WalletScreen() {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

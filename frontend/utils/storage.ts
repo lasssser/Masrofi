@@ -119,6 +119,7 @@ export interface Income {
   id: string;
   title: string;
   amount: number;
+  currency: 'TRY' | 'USD' | 'EUR' | 'SYP' | 'SAR' | 'AED'; // دعم العملات المتعددة
   date: string;
   isRecurring: boolean;
   frequency?: 'monthly' | 'weekly' | 'biweekly';

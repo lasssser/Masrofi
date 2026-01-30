@@ -307,43 +307,43 @@ export default function HomeScreen() {
               style={styles.seeAllButton}
               onPress={() => router.push('/wallet')}
             >
-              <Text style={styles.seeAllText}>عرض الكل</Text>
-              <Ionicons name="chevron-back" size={16} color={COLORS.primary} />
+              <Text style={[styles.seeAllText, { color: colors.primary }]}>عرض الكل</Text>
+              <Ionicons name="chevron-back" size={16} color={colors.primary} />
             </TouchableOpacity>
-            <Text style={styles.sectionTitle}>آخر المعاملات</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>آخر المعاملات</Text>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(800)} style={styles.transactionsList}>
+          <Animated.View entering={FadeInDown.delay(800)} style={[styles.transactionsList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             {recentExpenses.length > 0 ? (
               recentExpenses.map((expense, index) => (
-                <TouchableOpacity key={expense.id} style={styles.transactionItem}>
+                <TouchableOpacity key={expense.id} style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
                   <View style={[styles.transactionIcon, { backgroundColor: COLORS.categoryColors[expense.category as keyof typeof COLORS.categoryColors] + '20' }]}>
                     <Ionicons 
                       name="receipt-outline" 
                       size={20} 
-                      color={COLORS.categoryColors[expense.category as keyof typeof COLORS.categoryColors] || COLORS.primary} 
+                      color={COLORS.categoryColors[expense.category as keyof typeof COLORS.categoryColors] || colors.primary} 
                     />
                   </View>
                   <View style={styles.transactionInfo}>
-                    <Text style={styles.transactionTitle}>{expense.title}</Text>
-                    <Text style={styles.transactionDate}>
+                    <Text style={[styles.transactionTitle, { color: colors.text }]}>{expense.title}</Text>
+                    <Text style={[styles.transactionDate, { color: colors.textMuted }]}>
                       {new Date(expense.date).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })}
                     </Text>
                   </View>
-                  <Text style={[styles.transactionAmount, { color: COLORS.danger }]}>
+                  <Text style={[styles.transactionAmount, { color: colors.danger }]}>
                     -{formatTransactionAmount(expense.amount, expense.currency, settings.currency)}
                   </Text>
                 </TouchableOpacity>
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Ionicons name="receipt-outline" size={40} color={COLORS.textMuted} />
-                <Text style={styles.emptyText}>لا توجد معاملات بعد</Text>
+                <Ionicons name="receipt-outline" size={40} color={colors.textMuted} />
+                <Text style={[styles.emptyText, { color: colors.textMuted }]}>لا توجد معاملات بعد</Text>
                 <TouchableOpacity 
-                  style={styles.emptyButton}
+                  style={[styles.emptyButton, { backgroundColor: colors.primary }]}
                   onPress={() => router.push('/expense/add')}
                 >
-                  <Text style={styles.emptyButtonText}>أضف أول مصروف</Text>
+                  <Text style={[styles.emptyButtonText, { color: colors.white }]}>أضف أول مصروف</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -353,24 +353,24 @@ export default function HomeScreen() {
           <Animated.View entering={FadeInDown.delay(900)}>
             <TouchableOpacity onPress={() => setShowAIChat(true)}>
               <LinearGradient
-                colors={[COLORS.backgroundGlass, COLORS.glass]}
-                style={styles.tipCard}
+                colors={[colors.surface, colors.backgroundLight]}
+                style={[styles.tipCard, { borderColor: colors.border }]}
               >
                 <View style={styles.tipHeader}>
-                  <View style={styles.tipIconContainer}>
-                    <Ionicons name="sparkles" size={20} color={COLORS.accent} />
+                  <View style={[styles.tipIconContainer, { backgroundColor: colors.accent + '20' }]}>
+                    <Ionicons name="sparkles" size={20} color={colors.accent} />
                   </View>
-                  <Text style={styles.tipTitle}>نصيحة ذكية</Text>
+                  <Text style={[styles.tipTitle, { color: colors.accent }]}>نصيحة ذكية</Text>
                 </View>
-                <Text style={styles.tipText}>
+                <Text style={[styles.tipText, { color: colors.text }]}>
                   {balance >= 0 
                     ? `أحسنت! لديك ${formatCurrency(balance, settings.currency)} متبقي. حاول ادخار جزء منه.`
                     : `تنبيه: أنت تنفق أكثر من دخلك بـ ${formatCurrency(Math.abs(balance), settings.currency)}`
                   }
                 </Text>
                 <View style={styles.tipFooter}>
-                  <Text style={styles.tipAction}>تحدث مع المساعد الذكي</Text>
-                  <Ionicons name="chatbubble-ellipses" size={16} color={COLORS.primary} />
+                  <Text style={[styles.tipAction, { color: colors.primary }]}>تحدث مع المساعد الذكي</Text>
+                  <Ionicons name="chatbubble-ellipses" size={16} color={colors.primary} />
                 </View>
               </LinearGradient>
             </TouchableOpacity>

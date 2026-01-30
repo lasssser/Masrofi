@@ -233,6 +233,10 @@ export const expenseStorage = {
       return matchesQuery && matchesCategory && matchesWallet && matchesStartDate && matchesEndDate;
     });
   },
+  async getByMonth(month: string): Promise<Expense[]> {
+    const expenses = await this.getAll();
+    return expenses.filter(e => e.date.startsWith(month));
+  },
 };
 
 // Debts

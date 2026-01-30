@@ -85,41 +85,38 @@ export default function HomeScreen() {
   const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0;
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
           <Animated.View entering={FadeInDown.delay(100)} style={styles.header}>
             <View style={styles.headerLeft}>
-              <Text style={styles.greeting}>{greeting} 👋</Text>
-              <Text style={styles.headerTitle}>مصروفي</Text>
+              <Text style={[styles.greeting, { color: colors.textSecondary }]}>{greeting} 👋</Text>
+              <Text style={[styles.headerTitle, { color: colors.text }]}>مصروفي</Text>
             </View>
             <TouchableOpacity 
               style={styles.notificationButton}
-              onPress={() => router.push('/more')}
+              onPress={() => router.push('/alerts')}
             >
-              <LinearGradient
-                colors={[COLORS.glass, COLORS.backgroundGlass]}
-                style={styles.notificationGradient}
-              >
-                <Ionicons name="notifications-outline" size={22} color={COLORS.text} />
-                <View style={styles.notificationBadge} />
-              </LinearGradient>
+              <View style={[styles.notificationGradient, { backgroundColor: colors.surface }]}>
+                <Ionicons name="notifications-outline" size={22} color={colors.text} />
+                <View style={[styles.notificationBadge, { backgroundColor: colors.danger }]} />
+              </View>
             </TouchableOpacity>
           </Animated.View>
 
           {/* Main Balance Card */}
           <Animated.View entering={FadeInDown.delay(200)}>
             <LinearGradient
-              colors={COLORS.gradients.primary}
+              colors={colors.gradients.primary}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.balanceCard}

@@ -25,7 +25,7 @@ import {
   Expense,
   Income,
 } from '../../utils/storage';
-import { formatCurrency } from '../../utils/helpers';
+import { formatCurrency, formatTransactionAmount } from '../../utils/helpers';
 
 type Transaction = (Expense | Income) & { type: 'expense' | 'income' };
 
@@ -231,7 +231,7 @@ export default function WalletScreen() {
                       styles.transactionAmount,
                       { color: isExpense ? COLORS.danger : COLORS.secondary }
                     ]}>
-                      {isExpense ? '-' : '+'}{formatCurrency(transaction.amount, settings.currency)}
+                      {isExpense ? '-' : '+'}{formatTransactionAmount(transaction.amount, (transaction as any).currency, settings.currency)}
                     </Text>
                   </TouchableOpacity>
                 </Animated.View>

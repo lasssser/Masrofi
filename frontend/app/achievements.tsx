@@ -75,6 +75,12 @@ export default function AchievementsScreen() {
       
       {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-forward" size={24} color={COLORS.text} />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>الإنجازات</Text>
         <View style={styles.headerBadge}>
           <Text style={styles.headerBadgeText}>{unlockedCount}/{achievements.length}</Text>

@@ -24,7 +24,8 @@ import { SPACING, FONT_SIZES, BORDER_RADIUS, FONTS } from '../constants/theme';
 import { expenseStorage, incomeStorage, settingsStorage } from '../utils/storage';
 
 const { height } = Dimensions.get('window');
-const API_URL = 'http://45.9.191.190/masrofi-api';
+// Production API URL - Use environment variable or fallback to VPS
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://45.9.191.190/masrofi-api';
 
 interface ChatMessage {
   id: string;

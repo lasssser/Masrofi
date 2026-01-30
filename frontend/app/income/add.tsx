@@ -17,7 +17,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS } from '../../constants/theme';
-import { incomeStorage, settingsStorage, Settings } from '../../utils/storage';
+import { incomeStorage, settingsStorage, Settings, getCurrencySymbol } from '../../utils/storage';
+import CurrencySelector from '../../components/CurrencySelector';
 import { generateId, formatDate } from '../../utils/helpers';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -42,6 +43,7 @@ export default function AddIncomeScreen() {
   const [frequency, setFrequency] = useState<'monthly' | 'weekly' | 'biweekly'>('monthly');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currency, setCurrency] = useState('TRY');
   const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true, biometricEnabled: false, theme: 'dark', language: 'ar' });
 
   useEffect(() => {

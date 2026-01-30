@@ -113,6 +113,13 @@ export default function AddExpenseScreen() {
             keyboardType="decimal-pad"
           />
 
+          {/* Currency Selector */}
+          <CurrencySelector
+            label="العملة"
+            selected={currency}
+            onSelect={setCurrency}
+          />
+
           {/* Title */}
           <Input
             label="العنوان"

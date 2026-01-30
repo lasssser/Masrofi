@@ -16,18 +16,20 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../../constants/theme';
-import { expenseStorage, CATEGORIES, settingsStorage, Settings } from '../../utils/storage';
+import { expenseStorage, CATEGORIES, settingsStorage, Settings, getCurrencySymbol } from '../../utils/storage';
 import { generateId, formatDate } from '../../utils/helpers';
 import { checkAchievements, streakStorage } from '../../utils/achievements';
 import { checkSpendingAlerts } from '../../utils/alerts';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+import CurrencySelector from '../../components/CurrencySelector';
 
 export default function AddExpenseScreen() {
   const router = useRouter();
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('other');
+  const [currency, setCurrency] = useState('TRY');
   const [date, setDate] = useState(new Date());
   const [notes, setNotes] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -41,6 +43,7 @@ export default function AddExpenseScreen() {
   const loadSettings = async () => {
     const settingsData = await settingsStorage.get();
     setSettings(settingsData);
+    setCurrency(settingsData.currency); // Set default currency from settings
   };
 
   const handleSave = async () => {

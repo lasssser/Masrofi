@@ -250,10 +250,10 @@ export default function HomeScreen() {
           {/* Insights Cards */}
           <View style={styles.sectionHeader}>
             <TouchableOpacity style={styles.seeAllButton}>
-              <Text style={styles.seeAllText}>عرض الكل</Text>
-              <Ionicons name="chevron-back" size={16} color={COLORS.primary} />
+              <Text style={[styles.seeAllText, { color: colors.primary }]}>عرض الكل</Text>
+              <Ionicons name="chevron-back" size={16} color={colors.primary} />
             </TouchableOpacity>
-            <Text style={styles.sectionTitle}>نظرة سريعة</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>نظرة سريعة</Text>
           </View>
 
           <ScrollView 
@@ -263,40 +263,40 @@ export default function HomeScreen() {
           >
             <Animated.View entering={FadeInRight.delay(500)}>
               <LinearGradient
-                colors={[COLORS.secondary + '20', COLORS.secondary + '10']}
-                style={styles.insightCard}
+                colors={[colors.secondary + '20', colors.secondary + '10']}
+                style={[styles.insightCard, { borderColor: colors.border }]}
               >
-                <View style={[styles.insightIcon, { backgroundColor: COLORS.secondary + '30' }]}>
-                  <Ionicons name="trending-up" size={20} color={COLORS.secondary} />
+                <View style={[styles.insightIcon, { backgroundColor: colors.secondary + '30' }]}>
+                  <Ionicons name="trending-up" size={20} color={colors.secondary} />
                 </View>
-                <Text style={styles.insightValue}>{savingsRate}%</Text>
-                <Text style={styles.insightLabel}>نسبة التوفير</Text>
+                <Text style={[styles.insightValue, { color: colors.text }]}>{savingsRate}%</Text>
+                <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>نسبة التوفير</Text>
               </LinearGradient>
             </Animated.View>
 
             <Animated.View entering={FadeInRight.delay(600)}>
               <LinearGradient
-                colors={[COLORS.primary + '20', COLORS.primary + '10']}
-                style={styles.insightCard}
+                colors={[colors.primary + '20', colors.primary + '10']}
+                style={[styles.insightCard, { borderColor: colors.border }]}
               >
-                <View style={[styles.insightIcon, { backgroundColor: COLORS.primary + '30' }]}>
-                  <Ionicons name="calendar" size={20} color={COLORS.primary} />
+                <View style={[styles.insightIcon, { backgroundColor: colors.primary + '30' }]}>
+                  <Ionicons name="calendar" size={20} color={colors.primary} />
                 </View>
-                <Text style={styles.insightValue}>{forecast?.recurringExpenses || 0}</Text>
-                <Text style={styles.insightLabel}>مصاريف ثابتة</Text>
+                <Text style={[styles.insightValue, { color: colors.text }]}>{forecast?.recurringExpenses || 0}</Text>
+                <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>مصاريف ثابتة</Text>
               </LinearGradient>
             </Animated.View>
 
             <Animated.View entering={FadeInRight.delay(700)}>
               <LinearGradient
-                colors={[COLORS.accent + '20', COLORS.accent + '10']}
-                style={styles.insightCard}
+                colors={[colors.accent + '20', colors.accent + '10']}
+                style={[styles.insightCard, { borderColor: colors.border }]}
               >
-                <View style={[styles.insightIcon, { backgroundColor: COLORS.accent + '30' }]}>
-                  <Ionicons name="trophy" size={20} color={COLORS.accent} />
+                <View style={[styles.insightIcon, { backgroundColor: colors.accent + '30' }]}>
+                  <Ionicons name="trophy" size={20} color={colors.accent} />
                 </View>
-                <Text style={styles.insightValue}>{earnedBadges.length}</Text>
-                <Text style={styles.insightLabel}>إنجازات</Text>
+                <Text style={[styles.insightValue, { color: colors.text }]}>{earnedBadges.length}</Text>
+                <Text style={[styles.insightLabel, { color: colors.textSecondary }]}>إنجازات</Text>
               </LinearGradient>
             </Animated.View>
           </ScrollView>

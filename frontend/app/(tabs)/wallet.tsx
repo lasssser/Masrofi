@@ -208,17 +208,17 @@ export default function WalletScreen() {
                   key={transaction.id} 
                   entering={FadeInDown.delay(400 + index * 50)}
                 >
-                  <TouchableOpacity style={styles.transactionItem}>
-                    <View style={[styles.transactionIcon, { backgroundColor: (isExpense ? category.color : COLORS.secondary) + '20' }]}>
+                  <TouchableOpacity style={[styles.transactionItem, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <View style={[styles.transactionIcon, { backgroundColor: (isExpense ? category.color : colors.secondary) + '20' }]}>
                       <Ionicons 
                         name={isExpense ? (category.icon as any) : 'wallet'} 
                         size={22} 
-                        color={isExpense ? category.color : COLORS.secondary} 
+                        color={isExpense ? category.color : colors.secondary} 
                       />
                     </View>
                     <View style={styles.transactionInfo}>
-                      <Text style={styles.transactionTitle}>{transaction.title}</Text>
-                      <Text style={styles.transactionDate}>
+                      <Text style={[styles.transactionTitle, { color: colors.text }]}>{transaction.title}</Text>
+                      <Text style={[styles.transactionDate, { color: colors.textMuted }]}>
                         {new Date(transaction.date).toLocaleDateString('ar-SA', { 
                           day: 'numeric', 
                           month: 'short',
@@ -229,7 +229,7 @@ export default function WalletScreen() {
                     </View>
                     <Text style={[
                       styles.transactionAmount,
-                      { color: isExpense ? COLORS.danger : COLORS.secondary }
+                      { color: isExpense ? colors.danger : colors.secondary }
                     ]}>
                       {isExpense ? '-' : '+'}{formatTransactionAmount(transaction.amount, (transaction as any).currency, settings.currency)}
                     </Text>
@@ -239,19 +239,19 @@ export default function WalletScreen() {
             })
           ) : (
             <View style={styles.emptyState}>
-              <View style={styles.emptyIcon}>
-                <Ionicons name="wallet-outline" size={48} color={COLORS.textMuted} />
+              <View style={[styles.emptyIcon, { backgroundColor: colors.surface }]}>
+                <Ionicons name="wallet-outline" size={48} color={colors.textMuted} />
               </View>
-              <Text style={styles.emptyTitle}>لا توجد معاملات</Text>
-              <Text style={styles.emptyText}>
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>لا توجد معاملات</Text>
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>
                 {searchQuery ? 'لا توجد نتائج للبحث' : 'ابدأ بإضافة دخل أو مصروف'}
               </Text>
               {!searchQuery && (
                 <TouchableOpacity 
-                  style={styles.emptyButton}
+                  style={[styles.emptyButton, { backgroundColor: colors.primary }]}
                   onPress={() => router.push('/expense/add')}
                 >
-                  <Text style={styles.emptyButtonText}>أضف معاملة</Text>
+                  <Text style={[styles.emptyButtonText, { color: colors.white }]}>أضف معاملة</Text>
                 </TouchableOpacity>
               )}
             </View>

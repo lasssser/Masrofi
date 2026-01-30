@@ -27,6 +27,14 @@ export function formatCurrency(amount: number, currencyCode: string): string {
   return `${amount.toLocaleString('ar-SA')} ${symbol}`;
 }
 
+// Format amount with transaction's own currency
+export function formatTransactionAmount(amount: number, transactionCurrency?: string, defaultCurrency: string = 'TRY'): string {
+  const currencyCode = transactionCurrency || defaultCurrency;
+  const currency = CURRENCIES.find(c => c.code === currencyCode);
+  const symbol = currency?.symbol || currencyCode;
+  return `${amount.toLocaleString('ar-SA')} ${symbol}`;
+}
+
 export function isToday(dateString: string): boolean {
   const date = new Date(dateString);
   const today = new Date();

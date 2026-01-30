@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   StatusBar,
+  Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +34,8 @@ export default function AchievementsScreen() {
   const [streak, setStreak] = useState({ current: 0, longest: 0 });
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'all' | 'unlocked' | 'locked'>('all');
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const loadData = useCallback(async () => {
     const [achievementsData, pointsData, levelData, streakData] = await Promise.all([

@@ -63,6 +63,7 @@ export default function AddExpenseScreen() {
         id: generateId(),
         title: title.trim(),
         amount: parseFloat(amount),
+        currency: currency as any, // إضافة العملة
         category,
         date: date.toISOString(),
         notes: notes.trim() || undefined,

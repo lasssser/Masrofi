@@ -89,12 +89,12 @@ export default function WalletScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>المحفظة</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>المحفظة</Text>
           <TouchableOpacity 
             style={styles.addButton}
             onPress={() => router.push('/expense/add')}

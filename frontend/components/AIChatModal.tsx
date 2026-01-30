@@ -85,28 +85,40 @@ export default function AIChatModal({ visible, onClose }: AIChatModalProps) {
         expensesByCategory[e.category] = (expensesByCategory[e.category] || 0) + e.amount;
       });
 
-      const response = await fetch(`${API_URL}/api/ai-analysis`, {
+      const response = await fetch(`${API_URL}/api/ai/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: text.trim(),
           financial_data: {
-            total_income: totalIncome,
-            total_expenses: totalExpenses,
-            balance: totalIncome - totalExpenses,
-            expenses_by_category: expensesByCategory,
+            expenses: expenses.map(e => ({ amount: e.amount, category: e.category, title: e.title })),
+            incomes: incomes.map(i => ({ amount: i.amount, title: i.title })),
+            debts: [],
+            budgets: [],
+            savings_goals: [],
+            recurring_expenses: [],
             currency: settings.currency,
-            month: currentMonth,
           },
+          analysis_type: 'full',
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
+        // Build response from AI analysis
+        let responseText = data.analysis || '';
+        if (data.insights && data.insights.length > 0) {
+          responseText += '\n\n💡 ملاحظات:\n' + data.insights.map((i: string) => `• ${i}`).join('\n');
+        }
+        if (data.recommendations && data.recommendations.length > 0) {
+          responseText += '\n\n✅ توصيات:\n' + data.recommendations.map((r: string) => `• ${r}`).join('\n');
+        }
+        if (data.alerts && data.alerts.length > 0) {
+          responseText += '\n\n⚠️ تنبيهات:\n' + data.alerts.map((a: string) => `• ${a}`).join('\n');
+        }
         const aiMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: data.analysis || data.response || 'عذراً، لم أتمكن من الإجابة.',
+          content: responseText || 'عذراً، لم أتمكن من الإجابة.',
           timestamp: new Date(),
         };
         setMessages(prev => [...prev, aiMessage]);

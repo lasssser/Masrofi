@@ -39,8 +39,8 @@ export default function HomeScreen() {
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [forecast, setForecast] = useState<any>(null);
   const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
-  const [streak, setStreak] = useState(7);
-  const [earnedBadges, setEarnedBadges] = useState<string[]>(['first_expense', 'week_streak']);
+  const [streak, setStreak] = useState(0);
+  const [earnedBadges, setEarnedBadges] = useState<string[]>([]);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const greeting = getGreeting();

@@ -16,17 +16,19 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../../constants/theme';
-import { debtStorage, settingsStorage, Settings } from '../../utils/storage';
+import { debtStorage, settingsStorage, Settings, getCurrencySymbol } from '../../utils/storage';
 import { generateId, formatDate } from '../../utils/helpers';
 import { scheduleDebtReminder, requestNotificationPermissions } from '../../utils/notifications';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+import CurrencySelector from '../../components/CurrencySelector';
 
 export default function AddDebtScreen() {
   const router = useRouter();
   const [personName, setPersonName] = useState('');
   const [type, setType] = useState<'لنا' | 'علينا'>('لنا');
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('TRY');
   const [dueDate, setDueDate] = useState(new Date());
   const [notes, setNotes] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -40,6 +42,7 @@ export default function AddDebtScreen() {
   const loadSettings = async () => {
     const settingsData = await settingsStorage.get();
     setSettings(settingsData);
+    setCurrency(settingsData.currency); // Set default currency from settings
   };
 
   const handleSave = async () => {
@@ -60,6 +63,7 @@ export default function AddDebtScreen() {
         personName: personName.trim(),
         type,
         totalAmount: parseFloat(amount),
+        currency: currency as any, // إضافة العملة
         dueDate: dueDate.toISOString(),
         status: 'نشط' as const,
         notes: notes.trim() || undefined,
@@ -167,6 +171,13 @@ export default function AddDebtScreen() {
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
+          />
+
+          {/* Currency Selector */}
+          <CurrencySelector
+            label="العملة"
+            selected={currency}
+            onSelect={setCurrency}
           />
 
           {/* Due Date */}

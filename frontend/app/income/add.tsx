@@ -53,6 +53,7 @@ export default function AddIncomeScreen() {
   const loadSettings = async () => {
     const settingsData = await settingsStorage.get();
     setSettings(settingsData);
+    setCurrency(settingsData.currency); // Set default currency from settings
   };
 
   const handleSave = async () => {
@@ -72,6 +73,7 @@ export default function AddIncomeScreen() {
         id: generateId(),
         title: title.trim(),
         amount: parseFloat(amount),
+        currency: currency as any, // إضافة العملة
         date: date.toISOString(),
         isRecurring,
         frequency: isRecurring ? frequency : undefined,
@@ -115,7 +117,7 @@ export default function AddIncomeScreen() {
             <Text style={styles.amountLabel}>المبلغ</Text>
             <View style={styles.amountInputContainer}>
               <Text style={styles.currencySymbol}>
-                {settings.currency === 'TRY' ? '₺' : settings.currency === 'USD' ? '$' : settings.currency === 'EUR' ? '€' : 'ل.س'}
+                {getCurrencySymbol(currency)}
               </Text>
               <Input
                 placeholder="0"
@@ -127,6 +129,13 @@ export default function AddIncomeScreen() {
               />
             </View>
           </LinearGradient>
+
+          {/* Currency Selector */}
+          <CurrencySelector
+            label="العملة"
+            selected={currency}
+            onSelect={setCurrency}
+          />
 
           {/* Title */}
           <Input

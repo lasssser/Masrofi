@@ -23,6 +23,7 @@ import {
 } from '../utils/achievements';
 
 export default function AchievementsScreen() {
+  const router = useRouter();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [points, setPoints] = useState(0);
   const [level, setLevel] = useState(LEVELS[0]);

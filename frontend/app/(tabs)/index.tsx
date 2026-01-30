@@ -25,6 +25,7 @@ import {
 } from '../../utils/storage';
 import { formatCurrency, formatTransactionAmount } from '../../utils/helpers';
 import { streakStorage, achievementStorage } from '../../utils/achievements';
+import { alertStorage } from '../../utils/alerts';
 import AIChatModal from '../../components/AIChatModal';
 
 const { width } = Dimensions.get('window');

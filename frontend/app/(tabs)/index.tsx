@@ -257,7 +257,10 @@ export default function HomeScreen() {
 
           {/* Insights Cards */}
           <View style={styles.sectionHeader}>
-            <TouchableOpacity style={styles.seeAllButton}>
+            <TouchableOpacity 
+              style={styles.seeAllButton}
+              onPress={() => router.push('/achievements')}
+            >
               <Text style={[styles.seeAllText, { color: colors.primary }]}>عرض الكل</Text>
               <Ionicons name="chevron-back" size={16} color={colors.primary} />
             </TouchableOpacity>

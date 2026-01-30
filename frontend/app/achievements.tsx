@@ -202,6 +202,10 @@ export default function AchievementsScreen() {
                   !achievement.unlocked && styles.achievementCardLocked,
                 ]}
                 activeOpacity={0.7}
+                onPress={() => {
+                  setSelectedAchievement(achievement);
+                  setShowModal(true);
+                }}
               >
                 <View
                   style={[
@@ -279,8 +283,92 @@ export default function AchievementsScreen() {
           ))}
         </View>
       </ScrollView>
+
+      {/* Achievement Detail Modal */}
+      <Modal
+        visible={showModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {selectedAchievement && (
+              <>
+                <View style={[styles.modalIcon, { backgroundColor: selectedAchievement.color + '20' }]}>
+                  <Ionicons
+                    name={selectedAchievement.icon as any}
+                    size={48}
+                    color={selectedAchievement.color}
+                  />
+                </View>
+                <Text style={styles.modalTitle}>{selectedAchievement.title}</Text>
+                <Text style={styles.modalDescription}>{selectedAchievement.description}</Text>
+                
+                <View style={styles.modalDivider} />
+                
+                <View style={styles.modalInfoRow}>
+                  <Text style={styles.modalLabel}>الحالة:</Text>
+                  <Text style={[styles.modalValue, { color: selectedAchievement.unlocked ? COLORS.secondary : COLORS.warning }]}>
+                    {selectedAchievement.unlocked ? '✅ مفتوح' : '🔒 مقفل'}
+                  </Text>
+                </View>
+                
+                <View style={styles.modalInfoRow}>
+                  <Text style={styles.modalLabel}>النقاط:</Text>
+                  <Text style={styles.modalValue}>⭐ {selectedAchievement.points} نقطة</Text>
+                </View>
+                
+                {!selectedAchievement.unlocked && selectedAchievement.target && (
+                  <View style={styles.modalInfoRow}>
+                    <Text style={styles.modalLabel}>التقدم:</Text>
+                    <Text style={styles.modalValue}>
+                      {selectedAchievement.progress || 0} / {selectedAchievement.target}
+                    </Text>
+                  </View>
+                )}
+                
+                <View style={styles.modalDivider} />
+                
+                <Text style={styles.modalHowTo}>
+                  {selectedAchievement.unlocked 
+                    ? '🎉 أحسنت! لقد حققت هذا الإنجاز'
+                    : `💡 كيف تحقق هذا الإنجاز:\n${getAchievementHint(selectedAchievement.id)}`
+                  }
+                </Text>
+                
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: selectedAchievement.color }]}
+                  onPress={() => setShowModal(false)}
+                >
+                  <Text style={styles.modalButtonText}>حسناً</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
+}
+
+// Helper function for achievement hints
+function getAchievementHint(id: string): string {
+  const hints: { [key: string]: string } = {
+    'first_expense': 'أضف أول مصروف في التطبيق',
+    'week_streak': 'سجل مصاريفك يومياً لمدة 7 أيام متتالية',
+    'month_streak': 'سجل مصاريفك يومياً لمدة 30 يوم متتالي',
+    'budget_master': 'أنشئ 5 ميزانيات مختلفة',
+    'savings_starter': 'أنشئ هدف ادخار واحد على الأقل',
+    'savings_champion': 'حقق هدف ادخار كامل',
+    'expense_tracker': 'سجل 50 مصروف في التطبيق',
+    'expense_master': 'سجل 200 مصروف في التطبيق',
+    'category_explorer': 'استخدم 5 فئات مختلفة للمصاريف',
+    'debt_free': 'سدد جميع ديونك',
+    'first_income': 'أضف أول دخل في التطبيق',
+    'income_diversifier': 'أضف 3 مصادر دخل مختلفة',
+  };
+  return hints[id] || 'استمر في استخدام التطبيق لتحقيق هذا الإنجاز';
 }
 
 const styles = StyleSheet.create({

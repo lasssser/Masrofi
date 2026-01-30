@@ -24,6 +24,7 @@ import {
   financialAnalysis,
 } from '../../utils/storage';
 import { formatCurrency } from '../../utils/helpers';
+import AIChatModal from '../../components/AIChatModal';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - SPACING.md * 3) / 2;
@@ -33,6 +34,7 @@ export default function HomeScreen() {
   const { colors, isDark } = useTheme();
   const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true, biometricEnabled: false, theme: 'dark', language: 'ar' });
   const [refreshing, setRefreshing] = useState(false);
+  const [showAIChat, setShowAIChat] = useState(false);
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [forecast, setForecast] = useState<any>(null);

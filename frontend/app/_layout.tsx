@@ -215,6 +215,12 @@ export default function RootLayout() {
             headerShown: false,
           }} 
         />
+        <Stack.Screen 
+          name="themes" 
+          options={{ 
+            headerShown: false,
+          }} 
+        />
       </Stack>
     </SafeAreaProvider>
   );

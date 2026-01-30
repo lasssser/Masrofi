@@ -20,6 +20,7 @@ export interface Expense {
   id: string;
   title: string;
   amount: number;
+  currency: 'TRY' | 'USD' | 'EUR' | 'SYP' | 'SAR' | 'AED'; // دعم العملات المتعددة
   category: string;
   date: string;
   notes?: string;
@@ -33,6 +34,7 @@ export interface Debt {
   personName: string;
   type: 'لنا' | 'علينا';
   totalAmount: number;
+  currency: 'TRY' | 'USD' | 'EUR' | 'SYP' | 'SAR' | 'AED'; // دعم العملات المتعددة
   dueDate: string;
   status: 'نشط' | 'مدفوع';
   notes?: string;

@@ -244,7 +244,10 @@ export default function HomeScreen() {
                     <Text style={styles.streakSubtitle}>استمر في تسجيل مصاريفك!</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={styles.streakButton}>
+                <TouchableOpacity 
+                  style={styles.streakButton}
+                  onPress={() => router.push('/achievements')}
+                >
                   <Text style={styles.streakButtonText}>التحديات</Text>
                   <Ionicons name="chevron-back" size={16} color={COLORS.white} />
                 </TouchableOpacity>

@@ -6,8 +6,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts, Cairo_400Regular, Cairo_500Medium, Cairo_600SemiBold, Cairo_700Bold } from '@expo-google-fonts/cairo';
 import * as ExpoSplashScreen from 'expo-splash-screen';
 import { COLORS } from '../constants/theme';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import SplashScreen from '../components/SplashScreen';
 import BiometricLock from '../components/BiometricLock';
+import FloatingAIButton from '../components/FloatingAIButton';
 import { settingsStorage } from '../utils/storage';
 
 // Force RTL for Arabic

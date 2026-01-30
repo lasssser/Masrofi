@@ -142,11 +142,24 @@ export const CATEGORIES = [
 ];
 
 export const CURRENCIES = [
-  { code: 'TRY', symbol: '₺', label: 'ليرة تركية' },
-  { code: 'USD', symbol: '$', label: 'دولار أمريكي' },
-  { code: 'EUR', symbol: '€', label: 'يورو' },
-  { code: 'SYP', symbol: 'ل.س', label: 'ليرة سورية' },
+  { code: 'TRY', symbol: '₺', label: 'ليرة تركية', flag: '🇹🇷' },
+  { code: 'USD', symbol: '$', label: 'دولار أمريكي', flag: '🇺🇸' },
+  { code: 'EUR', symbol: '€', label: 'يورو', flag: '🇪🇺' },
+  { code: 'SYP', symbol: 'ل.س', label: 'ليرة سورية', flag: '🇸🇾' },
+  { code: 'SAR', symbol: 'ر.س', label: 'ريال سعودي', flag: '🇸🇦' },
+  { code: 'AED', symbol: 'د.إ', label: 'درهم إماراتي', flag: '🇦🇪' },
 ];
+
+// Helper function to get currency symbol
+export const getCurrencySymbol = (code: string): string => {
+  const currency = CURRENCIES.find(c => c.code === code);
+  return currency?.symbol || code;
+};
+
+// Helper function to get currency info
+export const getCurrencyInfo = (code: string) => {
+  return CURRENCIES.find(c => c.code === code) || CURRENCIES[0];
+};
 
 export const GOAL_COLORS = [
   '#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', 

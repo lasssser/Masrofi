@@ -14,7 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS, BADGES } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
+import { SPACING, FONT_SIZES, BORDER_RADIUS, FONTS, BADGES } from '../../constants/theme';
 import {
   expenseStorage,
   incomeStorage,
@@ -29,6 +30,7 @@ const CARD_WIDTH = (width - SPACING.md * 3) / 2;
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const [settings, setSettings] = useState<Settings>({ currency: 'TRY', notificationsEnabled: true, biometricEnabled: false, theme: 'dark', language: 'ar' });
   const [refreshing, setRefreshing] = useState(false);
   const [totalIncome, setTotalIncome] = useState(0);

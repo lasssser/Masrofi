@@ -269,9 +269,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  proInfo: {},
+  proInfo: {
+    flex: 1,
+  },
+  proTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
   proTitle: {
     fontSize: FONT_SIZES.md,
+    fontFamily: FONTS.bold,
+    color: COLORS.white,
+  },
+  freeBadge: {
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  freeBadgeText: {
+    fontSize: FONT_SIZES.xs,
     fontFamily: FONTS.bold,
     color: COLORS.white,
   },
@@ -279,6 +297,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     fontFamily: FONTS.regular,
     color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
   },
   section: {
     marginBottom: SPACING.lg,

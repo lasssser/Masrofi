@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { useTheme } from '../../context/ThemeContext';
-import { SPACING, FONT_SIZES, BORDER_RADIUS, FONTS, BADGES } from '../../constants/theme';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, FONTS, BADGES } from '../../constants/theme';
 import {
   expenseStorage,
   incomeStorage,

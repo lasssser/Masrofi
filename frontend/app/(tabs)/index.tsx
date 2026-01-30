@@ -119,7 +119,13 @@ export default function HomeScreen() {
             >
               <View style={[styles.notificationGradient, { backgroundColor: colors.surface }]}>
                 <Ionicons name="notifications-outline" size={22} color={colors.text} />
-                <View style={[styles.notificationBadge, { backgroundColor: colors.danger }]} />
+                {unreadAlerts > 0 && (
+                  <View style={[styles.notificationBadge, { backgroundColor: colors.danger }]}>
+                    <Text style={styles.notificationBadgeText}>
+                      {unreadAlerts > 9 ? '9+' : unreadAlerts}
+                    </Text>
+                  </View>
+                )}
               </View>
             </TouchableOpacity>
           </Animated.View>

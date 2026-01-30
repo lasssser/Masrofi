@@ -351,7 +351,7 @@ export default function HomeScreen() {
 
           {/* AI Tip */}
           <Animated.View entering={FadeInDown.delay(900)}>
-            <TouchableOpacity onPress={() => router.push('/analytics')}>
+            <TouchableOpacity onPress={() => setShowAIChat(true)}>
               <LinearGradient
                 colors={[COLORS.backgroundGlass, COLORS.glass]}
                 style={styles.tipCard}
@@ -369,8 +369,8 @@ export default function HomeScreen() {
                   }
                 </Text>
                 <View style={styles.tipFooter}>
-                  <Text style={styles.tipAction}>اطلب تحليل مفصّل</Text>
-                  <Ionicons name="chevron-back" size={16} color={COLORS.primary} />
+                  <Text style={styles.tipAction}>تحدث مع المساعد الذكي</Text>
+                  <Ionicons name="chatbubble-ellipses" size={16} color={COLORS.primary} />
                 </View>
               </LinearGradient>
             </TouchableOpacity>
@@ -380,6 +380,9 @@ export default function HomeScreen() {
           <View style={{ height: 100 }} />
         </ScrollView>
       </SafeAreaView>
+      
+      {/* AI Chat Modal */}
+      <AIChatModal visible={showAIChat} onClose={() => setShowAIChat(false)} />
     </View>
   );
 }

@@ -224,6 +224,16 @@ export default function RootLayout() {
           }} 
         />
       </Stack>
+      <FloatingAIButton />
     </SafeAreaProvider>
+  );
+}
+
+// Wrap with ThemeProvider
+export default function RootLayoutWrapper() {
+  return (
+    <ThemeProvider>
+      <RootLayout />
+    </ThemeProvider>
   );
 }

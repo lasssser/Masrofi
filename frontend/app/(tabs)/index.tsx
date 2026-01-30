@@ -57,13 +57,14 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      const [settingsData, expenses, incomes, forecastData, streakData, unlockedAchievements] = await Promise.all([
+      const [settingsData, expenses, incomes, forecastData, streakData, unlockedAchievements, alertsCount] = await Promise.all([
         settingsStorage.get(),
         expenseStorage.getByMonth(currentMonth),
         incomeStorage.getByMonth(currentMonth),
         financialAnalysis.getMonthlyForecast(currentMonth),
         streakStorage.get(),
         achievementStorage.getUnlocked(),
+        alertStorage.getUnreadCount(),
       ]);
       
       setSettings(settingsData);
@@ -73,6 +74,7 @@ export default function HomeScreen() {
       setRecentExpenses(expenses.slice(0, 5));
       setStreak(streakData.current);
       setEarnedBadges(unlockedAchievements.map(a => a.id));
+      setUnreadAlerts(alertsCount);
     } catch (error) {
       console.error('Error loading data:', error);
     }

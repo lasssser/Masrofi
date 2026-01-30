@@ -21,7 +21,7 @@ if (!I18nManager.isRTL) {
 // Keep splash screen visible while loading fonts
 ExpoSplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayout() {
   const [showSplash, setShowSplash] = useState(true);
   const [showBiometricLock, setShowBiometricLock] = useState(false);
   const [checkingBiometric, setCheckingBiometric] = useState(true);

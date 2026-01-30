@@ -43,6 +43,7 @@ export default function HomeScreen() {
   const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
   const [streak, setStreak] = useState(0);
   const [earnedBadges, setEarnedBadges] = useState<string[]>([]);
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const greeting = getGreeting();
